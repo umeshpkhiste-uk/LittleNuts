@@ -9,12 +9,14 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.littlenuts.app"
+      "bundleIdentifier": "com.littlenuts.app",
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.littlenuts.app",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#1C140D",
+        "backgroundColor": "#FDEBD5",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -33,7 +35,15 @@
     "plugins": [
       "expo-router",
       "expo-status-bar",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#FDEBD5"
+        }
+      ],
       [
         "expo-image-picker",
         {

@@ -74,10 +74,8 @@ Deferred / explicitly not done yet (by design, future phases):
 - No automated test suite yet (`tests/` has READMEs only) — test
   infrastructure is introduced alongside the features it covers, starting
   Phase 2.
-- App icon/splash still use Expo's default placeholder assets. The provided
-  logo (`design-assets/App Logo/Little Nuts Logo.png`) is 1264×842 (not
-  square) and would be distorted if used directly as an adaptive icon —
-  needs a proper square icon export before Phase 8 (release prep).
+- ~~App icon/splash still use Expo's default placeholder assets~~ — resolved
+  in Phase 8: the provided logo was cropped into a proper square icon set.
 
 ## Phase 2 — Supabase & authentication: DONE
 
@@ -720,4 +718,114 @@ into one regression check to rerun before release.
 - Store settings admin UI and a customer-facing notifications inbox
   remain deferred (unchanged from Phase 5/6's list).
 
-## Phase 8 — Release: NOT STARTED
+## Phase 8 — Release: DONE (prep & docs — the actual build/submit needs your accounts)
+
+Everything in this phase that can be done without an Expo/EAS account, a
+Google Play Console account, and a production Razorpay account is done.
+The remaining steps are documented in detail in the new **`RELEASE.md`**
+(repo root) and require your credentials to execute — see that file for
+the full walkthrough. This phase's own deliverable, per spec section 24,
+is "a tested Android release candidate," which in this environment means:
+code, config, and documentation are release-ready; the actual `eas build`
+→ Play Console submission is the one thing that can't happen without you.
+
+### What was built
+
+- **App icon & splash, finally real** — the provided brand logo
+  (`design-assets/App Logo/Little Nuts Logo.png`, 1264×842, not square) had
+  been flagged since Phase 1 as needing a proper square export before
+  release. Cropped and processed (via a one-off Python/Pillow script, not
+  committed — the *outputs* are what matter) into:
+  - `apps/mobile/assets/icon.png` (1024×1024) — the full circular medallion
+    (nuts cluster + "LittleNuts" wordmark + gold ring) flattened onto its
+    cream background, for iOS/general/web use.
+  - `apps/mobile/assets/android-icon-foreground.png` — the same medallion
+    as a transparent-background cutout (alpha channel built by
+    color-distance from the sampled background, not a hand-made mask), so
+    Android's adaptive icon system can mask it into a circle/squircle/
+    rounded-square without a hard-edged square showing through. Verified
+    by compositing it over the background color and applying a simulated
+    circular mask locally — the full wordmark and nut cluster survive the
+    crop with a comfortable margin.
+  - `apps/mobile/assets/android-icon-background.png` — solid cream
+    (`#FDEBD5`, sampled from the logo's own background), matching
+    `android.adaptiveIcon.backgroundColor` in `app.json` (previously
+    `#1C140D`, a dark placeholder that didn't match this asset at all).
+  - `apps/mobile/assets/android-icon-monochrome.png` — a clean solid-circle
+    silhouette (not a detail-preserving silhouette of the full medallion,
+    which came out illegible/noisy when generated from the photoreal
+    artwork) for Android 13+ themed icons, which get tinted to a single
+    color by the OS regardless of source detail.
+  - `apps/mobile/assets/splash-icon.png` and `favicon.png` regenerated from
+    the same source.
+  - `app.json`: added explicit `expo-splash-screen` plugin config
+    (previously just the bare plugin name with no image, so it showed a
+    blank screen), `android.versionCode: 1`, `ios.buildNumber: "1"`.
+- **`apps/mobile/eas.json`** (new) — `development`/`preview`/`production`
+  build profiles (production builds an `.aab` via
+  `"buildType": "app-bundle"`, matching what Play Console requires) and a
+  `submit.production` profile targeting Play's `internal` track first
+  rather than production directly.
+- **`RELEASE.md`** (new, repo root) — the full Google Play release
+  walkthrough: prerequisites checklist, backend production-readiness steps
+  (migrations, production Razorpay secrets, webhook URL configuration,
+  admin provisioning, store_settings review, email provider rate limits),
+  EAS environment variable setup, build, submit, Play Console listing
+  requirements, and a consolidated "known gaps to close before/shortly
+  after release" section pulling together what every prior phase flagged
+  as deferred (no crash reporting, no live Razorpay test, no store-settings
+  UI, no OTA update channel, no on-device testing).
+
+### Verified
+
+- **Security review** (spec section 25: "review security"):
+  - All 17 `public` schema tables confirmed to have RLS enabled —
+    `select count(*) filter (where rowsecurity) from pg_tables where
+    schemaname='public'` returns 17/17.
+  - Confirmed no service-role key, and no other secret, exists anywhere in
+    `apps/mobile` — grepped the app source and `app.json` for
+    `SERVICE_ROLE`/`service_role`; zero matches. The service-role key is
+    used only inside `supabase/functions/*` (Deno runtime, server-side).
+  - Confirmed `apps/mobile/.env` (the file holding real project
+    credentials) is git-ignored and was never committed — `git
+    check-ignore -v` and a full-history `git log` check both confirm this;
+    only the empty-valued `.env.example` template is tracked.
+  - Grepped all tracked files for common secret patterns
+    (`sb_secret_`, `service_role`, `sk_live`/`sk_test_` keys) — the only
+    hit was a comment in `supabase/config.toml` *mentioning* the word
+    `service_role` as a role name, not a credential.
+  - Re-ran `supabase db advisors --linked --type all` and `--type
+    performance`: only the same 10 expected
+    `authenticated_security_definer_function_executable` findings (every
+    admin-only or self-scoped RPC built across Phases 4–7), each
+    individually justified by an internal `private.require_admin()` or
+    `auth.uid()` check; `--type performance` returns no issues.
+  - Re-ran `supabase/tests/access_control_test.sql` (committed in Phase 7)
+    against the live project as a final regression pass: all checks
+    passed.
+- `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor` (21/21), and
+  `npx expo export --platform android` (then removed `dist/`) all clean
+  after the `app.json`/asset changes — confirms the new icon/splash config
+  doesn't break the build.
+- `eas.json` validated as well-formed JSON (`python3 -m json.tool`).
+- Visually reviewed the new icon assets directly (not just file-size/
+  dimension checks): the flat `icon.png`, the transparent
+  `android-icon-foreground.png` composited over its background color, that
+  same composite under a simulated circular launcher mask, and the
+  monochrome silhouette against a dark background — all read cleanly as
+  the intended round LittleNuts medallion.
+
+### Not yet verified / deferred (your action required)
+
+- The actual `eas login` → `eas build --platform android --profile
+  production` → Play Console submission was **not** run from this
+  environment — it needs your Expo/EAS account, Google Play Console
+  account, and (for a true production build) your production Razorpay
+  credentials. `RELEASE.md` is the exact walkthrough for when you're ready.
+- Everything listed under "Known gaps" in `RELEASE.md` (crash reporting,
+  live Razorpay testing, store-settings admin UI, OTA updates, on-device
+  testing) remains open — consolidated there rather than repeated here.
+- Store listing content itself (screenshots, feature graphic, description
+  copy, privacy policy text) was not produced — that's marketing/legal
+  content for you to write or commission, not something to draft
+  unprompted into the codebase.
