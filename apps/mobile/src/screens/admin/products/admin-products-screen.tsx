@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { formatWeight, paiseToRupeesLabel } from '@littlenuts/shared';
 
 import { useProducts } from '@/hooks/catalog/use-products';
+import { useRealtimeInvalidate } from '@/hooks/use-realtime-invalidate';
 import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
@@ -12,6 +13,8 @@ export function AdminProductsScreen() {
   const theme = useAppTheme();
   const [search, setSearch] = useState('');
   const products = useProducts({ includeInactive: true, search });
+
+  useRealtimeInvalidate('products', [['products']]);
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>

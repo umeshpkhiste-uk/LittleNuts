@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { paiseToRupeesLabel } from '@littlenuts/shared';
 
 import { useAdminOrders, type AdminOrderTab } from '@/hooks/admin/use-admin-orders';
+import { useRealtimeInvalidate } from '@/hooks/use-realtime-invalidate';
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from '@/lib/orders/labels';
 import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
@@ -24,6 +25,8 @@ export function AdminOrdersScreen() {
   const theme = useAppTheme();
   const [tab, setTab] = useState<AdminOrderTab>('new');
   const orders = useAdminOrders(tab);
+
+  useRealtimeInvalidate('orders', [['admin-orders']]);
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>

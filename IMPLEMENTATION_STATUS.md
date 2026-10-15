@@ -447,7 +447,120 @@ Deferred / explicitly not done yet:
   sees Admin 1's changes without refreshing) — Phase 6, per spec's own
   phase breakdown ("Realtime subscriptions" is listed there, not here).
 
-## Phase 6 — Inventory & synchronization: NOT STARTED
+## Phase 6 — Inventory & synchronization: DONE
+
+### What was built
+
+**Migration** (`supabase/migrations/20261016060000_inventory_and_realtime.sql`):
+
+- `inventory_movements` — audit ledger for every stock change (`product_id`,
+  `order_id` nullable, signed `change_g`, `reason`, `created_by`,
+  `created_at`). Admin-only select; no client insert/update/delete policy —
+  written only by the functions below.
+- `accept_order` extended in place (as the Phase 5 migration's own comment
+  said it would): now locks every product the order touches (`for update`,
+  ordered by `product_id` to match `create_order`'s lock order and avoid
+  deadlocks), checks each item has enough stock, and only if every item
+  clears does it deduct `stock_weight_g` and insert one
+  `inventory_movements` row per product (`reason = 'order_acceptance'`,
+  negative `change_g`). If any item is short the whole acceptance fails and
+  the order stays `pending` — no partial deduction.
+- `admin_cancel_order(order_id, reason)` — new function for cancelling an
+  order that was already accepted (and so already deducted stock), while
+  it's still early enough to matter (`accepted`, `preparing`, or
+  `ready_for_dispatch`; refused once `out_for_delivery`/`delivered`).
+  Restores stock for every item, logs positive `inventory_movements` rows
+  (`reason = 'order_cancellation_restock'`), moves the order to
+  `cancelled`, writes status history + audit log, and notifies the
+  customer.
+- `adjust_product_stock(product_id, new_stock_weight_g, reason)` — new
+  function, the only sanctioned way to change `products.stock_weight_g`
+  outside order acceptance/cancellation (e.g. a new delivery arriving, or a
+  correction after a physical count). Requires a non-empty reason, computes
+  and logs the signed delta, and records an admin_audit_logs entry.
+  Replaces the raw `update products set stock_weight_g = ...` the admin app
+  previously issued directly from the client.
+- Realtime: `public.orders`, `public.products`, and `public.notifications`
+  added to the `supabase_realtime` publication (idempotently, guarded by
+  `pg_publication_tables` checks). RLS on each table still governs which
+  rows a given subscriber's events cover — no new policies were needed
+  since the existing admin-select policies on `orders`/`products` already
+  grant admins full visibility.
+
+### What was built — mobile app
+
+- `use-realtime-invalidate.ts` — a small reusable hook,
+  `useRealtimeInvalidate(table, queryKeys)`, that opens a Supabase Realtime
+  channel for a table and invalidates the given TanStack Query keys on any
+  `postgres_changes` event, so screens stay live without polling.
+- Wired into: the admin dashboard (`orders` + `products` →
+  `admin-dashboard-summary`), the admin orders list (`orders` →
+  `admin-orders`), the admin order detail screen (`orders` →
+  `admin-order`/`admin-orders`), and the admin products list (`products` →
+  `products`). Two admins with the order list or an order detail screen
+  open now see each other's accept/reject/status-change/cancel actions
+  appear live.
+- Admin order detail screen: added a "Cancel Order" action (reason
+  required, same inline-input pattern as Reject) for orders in
+  `accepted`/`preparing`/`ready_for_dispatch`, calling the new
+  `useAdminCancelOrder` hook.
+- Admin product edit screen: the general product-edit form no longer lets
+  stock be silently changed as part of an unrelated edit (e.g. changing the
+  price). It now shows current stock as read-only text and a separate
+  "Adjust Stock" section (new stock value + required reason) that calls
+  `adjust_product_stock` via the updated `useAdjustStock` hook. Creating a
+  brand-new product still takes an initial stock value directly (no history
+  to protect yet). `ProductForm` gained an optional `footer` prop so this
+  section renders inside the same scroll view instead of nesting a second
+  `ScrollView`.
+- `packages/shared/src/types.ts`: added the `InventoryMovement` type.
+
+### Verified
+
+- `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor` (21/21), and
+  `npx expo export --platform android` (then removed `dist/`) all clean.
+- `supabase db advisors --linked --type all`: only the same
+  authenticated-callable-SECURITY-DEFINER-function warnings seen in every
+  prior phase, for the three new/changed functions — expected, since each
+  starts with `private.require_admin()`.
+- Live backend verification against the linked project (simulated
+  sessions via `request.jwt.claims` + `set local role authenticated`,
+  cleaned up afterward, zero residue confirmed): created two orders for the
+  same product (stock 150g, two orders of 100g each); accepting order 1
+  succeeded and correctly dropped stock to 50g; accepting order 2 correctly
+  failed with "Insufficient stock" and left order 2 untouched (still
+  `pending`, no partial deduction); `admin_cancel_order` on the now-accepted
+  order 1 correctly restored stock to 150g and logged a second movement row
+  (deduct + restore = 2 rows, as expected); `adjust_product_stock` correctly
+  set stock to 500g and logged a +350g movement with the given reason; a
+  non-admin calling `adjust_product_stock` was correctly rejected with
+  "Admin privileges required".
+- Realtime verified live end-to-end (not just publication membership): a
+  Node script using `@supabase/supabase-js` with the real anon key
+  subscribed to `postgres_changes` on `public.products` against the linked
+  project, and a `supabase db query --linked` update to a product row was
+  received by the subscriber within seconds as an `UPDATE` event.
+- `pg_publication_tables` confirmed `orders`, `products`, and
+  `notifications` are all members of `supabase_realtime`.
+
+### Not yet verified / deferred
+
+- On-device testing of the realtime UI wiring itself (does the admin
+  orders screen actually re-render when a channel event fires) — verified
+  the Realtime delivery mechanism end-to-end from Node, and the
+  invalidation wiring type-checks and lints clean, but there's still no
+  emulator/device available in this environment to watch two admin
+  sessions update live on-screen. Same standing limitation noted in every
+  prior phase.
+- Concurrent-admin race on `accept_order` itself (two admins literally
+  racing to accept the *same* order at the same instant) relies on
+  Postgres's row lock (`for update` on the order row, already present
+  since Phase 5) — not re-tested here since Phase 5's test suite already
+  covered "second accept on an already-accepted order fails," which is the
+  same code path.
+- COD collection confirmation, admin store-settings UI, and a customer-
+  facing notifications inbox remain deferred (unchanged from Phase 5's
+  list) — none are blocking for Phase 6's inventory/sync scope.
 
 ## Phase 7 — Refunds & production hardening: NOT STARTED
 

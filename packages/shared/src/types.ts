@@ -109,6 +109,16 @@ export type Order = {
   updated_at: string;
 };
 
+export type InventoryMovement = {
+  id: string;
+  product_id: string;
+  order_id: string | null;
+  change_g: number;
+  reason: string;
+  created_by: string | null;
+  created_at: string;
+};
+
 export type OrderItem = {
   id: string;
   order_id: string;

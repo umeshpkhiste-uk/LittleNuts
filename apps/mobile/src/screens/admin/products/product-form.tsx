@@ -18,6 +18,7 @@ type ProductFormProps = {
   submitLabel: string;
   isSubmitting: boolean;
   onSubmit: (values: ProductFormValues) => Promise<void>;
+  footer?: React.ReactNode;
 };
 
 function slugify(text: string): string {
@@ -28,7 +29,13 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-export function ProductForm({ initial, submitLabel, isSubmitting, onSubmit }: ProductFormProps) {
+export function ProductForm({
+  initial,
+  submitLabel,
+  isSubmitting,
+  onSubmit,
+  footer,
+}: ProductFormProps) {
   const theme = useAppTheme();
   const categories = useCategories({ includeInactive: true });
 
@@ -243,12 +250,19 @@ export function ProductForm({ initial, submitLabel, isSubmitting, onSubmit }: Pr
         </View>
       </View>
 
-      <FormTextInput
-        label="Stock (g)"
-        value={stockWeightG}
-        onChangeText={setStockWeightG}
-        keyboardType="number-pad"
-      />
+      {!initial ? (
+        <FormTextInput
+          label="Initial stock (g)"
+          value={stockWeightG}
+          onChangeText={setStockWeightG}
+          keyboardType="number-pad"
+        />
+      ) : (
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>
+          Stock: {initial.stock_weight_g}g — use &quot;Adjust Stock&quot; below to change it (keeps a
+          reasoned history and can&apos;t be edited here).
+        </Text>
+      )}
 
       <View style={styles.switchRow}>
         <Text style={[styles.switchLabel, { color: theme.textPrimary }]}>Active</Text>
@@ -260,6 +274,8 @@ export function ProductForm({ initial, submitLabel, isSubmitting, onSubmit }: Pr
       </View>
 
       {error ? <Text style={[styles.error, { color: theme.danger }]}>{error}</Text> : null}
+
+      {footer}
 
       <PrimaryButton
         title={submitLabel}

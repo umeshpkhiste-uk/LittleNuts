@@ -117,6 +117,26 @@ export function useRejectOrder() {
   });
 }
 
+export function useAdminCancelOrder() {
+  const invalidate = useInvalidateOrderQueries();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, reason }: { orderId: string; reason: string }) => {
+      const { data, error } = await supabase.rpc('admin_cancel_order', {
+        p_order_id: orderId,
+        p_reason: reason,
+      });
+      if (error) throw error;
+      return data as Order;
+    },
+    onSuccess: (_data, variables) => {
+      invalidate(variables.orderId);
+      // Cancelling restores stock, so product listings/stock figures go stale too.
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
 export function useUpdateOrderStatus() {
   const invalidate = useInvalidateOrderQueries();
   return useMutation({

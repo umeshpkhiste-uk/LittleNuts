@@ -3,12 +3,16 @@ import { router } from 'expo-router';
 import { paiseToRupeesLabel } from '@littlenuts/shared';
 
 import { useAdminDashboardSummary } from '@/hooks/admin/use-admin-dashboard';
+import { useRealtimeInvalidate } from '@/hooks/use-realtime-invalidate';
 import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 export function AdminDashboardScreen() {
   const theme = useAppTheme();
   const { data, isLoading } = useAdminDashboardSummary();
+
+  useRealtimeInvalidate('orders', [['admin-dashboard-summary']]);
+  useRealtimeInvalidate('products', [['admin-dashboard-summary']]);
 
   if (isLoading || !data) {
     return (

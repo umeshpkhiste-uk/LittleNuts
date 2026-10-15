@@ -7,10 +7,12 @@ import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
 import {
   useAcceptOrder,
+  useAdminCancelOrder,
   useAdminOrder,
   useRejectOrder,
   useUpdateOrderStatus,
 } from '@/hooks/admin/use-admin-orders';
+import { useRealtimeInvalidate } from '@/hooks/use-realtime-invalidate';
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from '@/lib/orders/labels';
 import { useAppTheme } from '@/theme/theme-provider';
 import { spacing, typography } from '@/theme/tokens';
@@ -22,15 +24,22 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   out_for_delivery: 'delivered',
 };
 
+const CANCELLABLE_STATUSES: OrderStatus[] = ['accepted', 'preparing', 'ready_for_dispatch'];
+
 export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
   const theme = useAppTheme();
   const { data, isLoading } = useAdminOrder(orderId);
   const acceptOrder = useAcceptOrder();
   const rejectOrder = useRejectOrder();
   const updateStatus = useUpdateOrderStatus();
+  const cancelOrder = useAdminCancelOrder();
+
+  useRealtimeInvalidate('orders', [['admin-order', orderId], ['admin-orders']]);
 
   const [showRejectInput, setShowRejectInput] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [showCancelInput, setShowCancelInput] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   if (isLoading || !data) {
@@ -76,6 +85,20 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
       await updateStatus.mutateAsync({ orderId, newStatus: nextStatus });
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'Could not update status.');
+    }
+  }
+
+  async function handleCancel() {
+    setError(null);
+    if (!cancelReason.trim()) {
+      setError('A cancellation reason is required.');
+      return;
+    }
+    try {
+      await cancelOrder.mutateAsync({ orderId, reason: cancelReason.trim() });
+      router.back();
+    } catch (cancelError) {
+      setError(cancelError instanceof Error ? cancelError.message : 'Could not cancel order.');
     }
   }
 
@@ -171,15 +194,41 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
             />
           )}
         </View>
-      ) : nextStatus ? (
+      ) : (
         <View style={styles.actions}>
-          <PrimaryButton
-            title={`Mark as ${ORDER_STATUS_LABELS[nextStatus]}`}
-            loading={updateStatus.isPending}
-            onPress={handleAdvanceStatus}
-          />
+          {nextStatus ? (
+            <PrimaryButton
+              title={`Mark as ${ORDER_STATUS_LABELS[nextStatus]}`}
+              loading={updateStatus.isPending}
+              onPress={handleAdvanceStatus}
+            />
+          ) : null}
+
+          {CANCELLABLE_STATUSES.includes(order.status) ? (
+            showCancelInput ? (
+              <>
+                <FormTextInput
+                  label="Cancellation reason"
+                  value={cancelReason}
+                  onChangeText={setCancelReason}
+                />
+                <PrimaryButton
+                  title="Confirm Cancellation (restocks items)"
+                  variant="secondary"
+                  loading={cancelOrder.isPending}
+                  onPress={handleCancel}
+                />
+              </>
+            ) : (
+              <PrimaryButton
+                title="Cancel Order"
+                variant="secondary"
+                onPress={() => setShowCancelInput(true)}
+              />
+            )
+          ) : null}
         </View>
-      ) : null}
+      )}
     </ScrollView>
   );
 }

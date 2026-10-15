@@ -79,19 +79,27 @@ export function useUpdateProduct() {
   });
 }
 
-// Stock adjustment is kept separate from the general product edit form so
-// that in Phase 6 it can be swapped for a trusted `adjust_inventory`
-// database function call (with a reason + inventory_movements audit row)
-// without touching the rest of the product form.
+// Goes through adjust_product_stock (not a raw table update) so every
+// stock change is reasoned and recorded in inventory_movements.
 export function useAdjustStock() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, newStockWeightG }: { id: string; newStockWeightG: number }) => {
-      const { error } = await supabase
-        .from('products')
-        .update({ stock_weight_g: newStockWeightG })
-        .eq('id', id);
+    mutationFn: async ({
+      id,
+      newStockWeightG,
+      reason,
+    }: {
+      id: string;
+      newStockWeightG: number;
+      reason: string;
+    }) => {
+      const { data, error } = await supabase.rpc('adjust_product_stock', {
+        p_product_id: id,
+        p_new_stock_weight_g: newStockWeightG,
+        p_reason: reason,
+      });
       if (error) throw error;
+      return data as Product;
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
