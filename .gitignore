@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+
+# env
+.env
+.env.local
+.env.*.local
+
+# Supabase local dev
+supabase/.branches/
+supabase/.temp/

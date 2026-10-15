@@ -1,0 +1,11 @@
+{
+  "name": "littlenuts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LittleNuts dry fruit e-commerce Android app — monorepo root (apps/mobile, packages/shared, supabase/*). Each package manages its own dependencies independently.",
+  "scripts": {
+    "mobile": "cd apps/mobile && npx expo start",
+    "typecheck": "cd packages/shared && npx tsc --noEmit -p tsconfig.json && cd ../../apps/mobile && npx tsc --noEmit",
+    "lint": "cd apps/mobile && npx expo lint"
+  }
+}

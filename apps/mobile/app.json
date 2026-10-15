@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "LittleNuts",
+    "slug": "littlenuts",
+    "scheme": "littlenuts",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.littlenuts.app"
+    },
+    "android": {
+      "package": "com.littlenuts.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#1C140D",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-splash-screen",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "LittleNuts uses your photos to let admins upload product images.",
+          "cameraPermission": "LittleNuts uses your camera to let admins capture product images."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#C8841E"
+        }
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "router": {}
+    }
+  }
+}
