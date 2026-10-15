@@ -1,11 +1,5 @@
-import { ScreenPlaceholder } from '@/components/screen-placeholder';
+import { AdminOrdersScreen } from '@/screens/admin/orders';
 
 export default function AdminOrders() {
-  return (
-    <ScreenPlaceholder
-      title="Order Management"
-      description="New, Paid Awaiting Acceptance, Accepted, Preparing, Dispatch, Delivered, Rejected/Cancelled."
-      phase="Arrives in Phase 5"
-    />
-  );
+  return <AdminOrdersScreen />;
 }

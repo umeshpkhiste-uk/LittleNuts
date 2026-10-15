@@ -369,7 +369,83 @@ Deferred / explicitly not done yet:
   are in place (unique `provider_event_id`, non-terminal-attempt reuse)
   but only unit-level-verified, not load-tested.
 
-## Phase 5 — Admin order management: NOT STARTED
+## Phase 5 — Admin order management: DONE
+
+What was built:
+
+- Migrations: `order_status_history`, `admin_audit_logs`, `notifications`
+  (all RLS'd — customers see only their own history/notifications, admins
+  see all audit logs), plus `private.notify_user()`,
+  `private.require_admin()`, and the SECURITY DEFINER functions
+  `accept_order`, `reject_order`, `update_order_status`, `cancel_order`,
+  and `get_admin_dashboard_summary`. `create_order` was re-pointed to also
+  send an "order placed" notification now that `notify_user` exists.
+  `accept_order` here transitions pending→accepted and records
+  who/when/history/notification but does **not** touch
+  `products.stock_weight_g` yet — atomic stock deduction is Phase 6 by
+  design (spec section 24 splits these across Phase 5 vs 6 explicitly);
+  `accept_order` will be extended in place there, not replaced.
+  `update_order_status` only allows the forward sequence
+  accepted→preparing→ready_for_dispatch→out_for_delivery→delivered, no
+  skipping, no going backward. `reject_order` requires a non-empty reason.
+  `cancel_order` is customer-initiated and only works while an order is
+  still `pending` (no stock implications, since pending orders never
+  deduct stock).
+- Razorpay Edge Functions updated to send `payment_success` /
+  `payment_failed` notifications (spec section 21) and redeployed.
+- App: admin Dashboard (today's order counts by status, today's revenue
+  split into order value / online payments received / COD collected
+  (always ₹0 for now, clearly labeled why — COD collection confirmation
+  isn't built yet) / net realized receipts, low-stock and out-of-stock
+  counts, a payment-reconciliation warning banner for paid orders stuck
+  pending over 2 hours), admin Orders (the 9 tabs from spec section 14:
+  New, Paid Awaiting Acceptance, Accepted, Preparing, Ready for Dispatch,
+  Out for Delivery, Delivered, Rejected/Cancelled, All), and an admin
+  Order Detail screen (customer name/phone, delivery address, items with
+  total weight, payment status with a visible warning if an online order
+  isn't yet paid, Accept/Reject with a required reason, and "Mark as
+  ⟨next status⟩" for in-progress orders).
+
+Verified (all passing):
+
+- `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor` (21/21), `npx expo
+  export --platform android` — all clean.
+- `supabase db advisors --linked --type all` — only the expected,
+  reviewed SECURITY-DEFINER-callable-by-authenticated findings for
+  `accept_order`/`reject_order`/`update_order_status`/`cancel_order`/
+  `create_order`/`get_admin_dashboard_summary` (each has its own internal
+  `require_admin()` or ownership check).
+- Full order-management flow exercised directly against Postgres (real
+  product/address, simulated customer + admin sessions): a non-admin
+  cannot call `accept_order` (rejected with "Admin privileges required");
+  an admin accepts a pending order (status/accepted_by set correctly); a
+  second accept attempt on the same order is rejected ("not pending");
+  status progresses accepted→preparing→ready_for_dispatch correctly;
+  skipping straight to `delivered` is rejected ("Cannot move order
+  from…"); exactly 3 `order_status_history` rows and 4 notifications
+  (placed, accepted, preparing, ready_for_dispatch) were created. Also
+  verified `get_admin_dashboard_summary` is admin-only (non-admin
+  rejected) and callable by admin — caught and fixed a real bug in the
+  process (`sum(bigint)` returns `numeric` in Postgres, not `bigint`,
+  which didn't match the function's declared return type). Test data
+  cleaned up after each run, confirmed zero residue.
+
+Not yet verified: the actual screens on-device (same constraint as prior
+phases).
+
+Deferred / explicitly not done yet:
+
+- Stock deduction on acceptance, concurrency protection, and
+  `inventory_movements` — Phase 6, by design.
+- COD collection confirmation (`record_cod_collection`) — Phase 6/7; COD
+  revenue is honestly reported as ₹0 until then rather than guessed.
+- Admin "More" tab still only has Categories + Sign Out — store settings
+  editing (delivery fee, tax, COD/online toggles) has a DB-backed home
+  (`store_settings`, already admin-write-RLS'd) but no admin UI yet; it's
+  currently editable only via the Dashboard SQL Editor.
+- Realtime dual-admin sync (Supabase Realtime subscriptions so Admin 2
+  sees Admin 1's changes without refreshing) — Phase 6, per spec's own
+  phase breakdown ("Realtime subscriptions" is listed there, not here).
 
 ## Phase 6 — Inventory & synchronization: NOT STARTED
 

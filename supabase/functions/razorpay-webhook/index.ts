@@ -129,12 +129,20 @@ async function handlePaymentCaptured(
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, payment_status')
+    .select('id, user_id, order_number, payment_status')
     .eq('id', attempt.order_id)
     .single();
 
   if (order && order.payment_status !== 'paid') {
     await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id);
+    await notify(
+      supabase,
+      order.user_id,
+      'payment_success',
+      'Payment successful',
+      `Payment received for order ${order.order_number}.`,
+      order.id,
+    );
   }
 }
 
@@ -144,7 +152,7 @@ async function handlePaymentFailed(
 ) {
   const { data: attempt } = await supabase
     .from('payment_attempts')
-    .select('id, status')
+    .select('id, order_id, status')
     .eq('provider', 'razorpay')
     .eq('provider_order_id', razorpayOrderId)
     .maybeSingle();
@@ -155,6 +163,37 @@ async function handlePaymentFailed(
     .from('payment_attempts')
     .update({ status: 'failed', failure_reason: 'Payment failed (webhook)' })
     .eq('id', attempt.id);
+
+  const { data: order } = await supabase
+    .from('orders')
+    .select('id, user_id, order_number')
+    .eq('id', attempt.order_id)
+    .single();
+
+  if (order) {
+    await notify(
+      supabase,
+      order.user_id,
+      'payment_failed',
+      'Payment failed',
+      `Your payment for order ${order.order_number} failed.`,
+      order.id,
+    );
+  }
+}
+
+async function notify(
+  client: ReturnType<typeof createClient>,
+  userId: string,
+  type: string,
+  title: string,
+  message: string,
+  orderId: string,
+) {
+  const { error } = await client
+    .from('notifications')
+    .insert({ user_id: userId, type, title, message, related_order_id: orderId });
+  if (error) console.error('Failed to insert notification', error);
 }
 
 async function markEvent(

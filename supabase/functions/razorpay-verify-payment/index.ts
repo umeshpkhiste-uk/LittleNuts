@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     });
     const { data: order, error: orderError } = await userClient
       .from('orders')
-      .select('id, payment_status')
+      .select('id, user_id, order_number, payment_status')
       .eq('id', orderId)
       .single();
     if (orderError || !order) {
@@ -68,11 +68,22 @@ Deno.serve(async (req) => {
         .from('payment_attempts')
         .update({ status: 'failed', failure_reason: 'Signature verification failed' })
         .eq('id', attempt.id);
+      await notify(
+        serviceClient,
+        order.user_id,
+        'payment_failed',
+        'Payment failed',
+        `We couldn't verify your payment for order ${order.order_number}. Please try again.`,
+        orderId,
+      );
       return jsonResponse({ error: 'Signature verification failed', verified: false }, 400);
     }
 
     // Idempotent: if a prior call (or the webhook) already verified this
-    // attempt, this just re-confirms the same state rather than erroring.
+    // attempt, this just re-confirms the same state rather than erroring —
+    // including not sending a second "payment success" notification.
+    const wasAlreadyPaid = order.payment_status === 'paid';
+
     await serviceClient
       .from('payment_attempts')
       .update({
@@ -82,8 +93,16 @@ Deno.serve(async (req) => {
       })
       .eq('id', attempt.id);
 
-    if (order.payment_status !== 'paid') {
+    if (!wasAlreadyPaid) {
       await serviceClient.from('orders').update({ payment_status: 'paid' }).eq('id', orderId);
+      await notify(
+        serviceClient,
+        order.user_id,
+        'payment_success',
+        'Payment successful',
+        `Payment received for order ${order.order_number}.`,
+        orderId,
+      );
     }
 
     return jsonResponse({ verified: true });
@@ -98,4 +117,18 @@ function jsonResponse(body: unknown, status = 200): Response {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+}
+
+async function notify(
+  client: ReturnType<typeof createClient>,
+  userId: string,
+  type: string,
+  title: string,
+  message: string,
+  orderId: string,
+) {
+  const { error } = await client
+    .from('notifications')
+    .insert({ user_id: userId, type, title, message, related_order_id: orderId });
+  if (error) console.error('Failed to insert notification', error);
 }
