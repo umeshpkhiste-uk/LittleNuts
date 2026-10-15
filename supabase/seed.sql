@@ -1,0 +1,67 @@
+-- Starter catalog so Phase 3 has real data to browse/search/cart against.
+-- This is NOT "hardcoding the catalog" (spec section 3) — every row here is
+-- a normal row in categories/products, fully editable, deactivatable, and
+-- deletable through the admin UI like any other. It's just a reasonable
+-- starting point for a store that hasn't entered its own inventory yet.
+-- Idempotent: safe to re-run.
+
+insert into public.categories (name, slug, description, sort_order) values
+  ('Almonds / Badam', 'almonds-badam', 'Premium California and Mamra almonds.', 1),
+  ('Cashews / Kaju', 'cashews-kaju', 'Whole and broken cashews, roasted and raw.', 2),
+  ('Pistachios / Pista', 'pistachios-pista', 'Roasted and salted pistachios.', 3),
+  ('Walnuts / Akhrot', 'walnuts-akhrot', 'Kashmiri and Californian walnut kernels.', 4),
+  ('Raisins / Kishmish', 'raisins-kishmish', 'Green and golden seedless raisins.', 5),
+  ('Dates / Khajoor', 'dates-khajoor', 'Medjool, Ajwa, and Kimia dates.', 6),
+  ('Figs / Anjeer', 'figs-anjeer', 'Sun-dried Afghani and Turkish figs.', 7),
+  ('Dried Apricots', 'dried-apricots', 'Turkish and Afghani dried apricots.', 8),
+  ('Mixed Dry Fruits', 'mixed-dry-fruits', 'Curated mixes for gifting and snacking.', 9),
+  ('Seeds', 'seeds', 'Pumpkin, sunflower, chia, and flax seeds.', 10)
+on conflict (slug) do nothing;
+
+insert into public.products (
+  category_id, name, slug, sku, short_description, description,
+  price_per_kg_paise, min_order_weight_g, max_order_weight_g, weight_increment_g,
+  stock_weight_g, reorder_threshold_g, is_featured
+)
+select c.id, p.name, p.slug, p.sku, p.short_description, p.description,
+  p.price_per_kg_paise, p.min_order_weight_g, p.max_order_weight_g, p.weight_increment_g,
+  p.stock_weight_g, p.reorder_threshold_g, p.is_featured
+from (values
+  ('almonds-badam', 'California Almonds', 'california-almonds', 'ALM-CA-001',
+    'Rich in protein, fiber and vitamin E.', 'Premium California almonds, carefully sorted and cleaned.',
+    69900, 100, 5000, 50, 20000, 2000, true),
+  ('almonds-badam', 'Mamra Almonds', 'mamra-almonds', 'ALM-MA-001',
+    'Premium Iranian Mamra almonds.', 'Smaller, denser, and more flavorful than regular almonds.',
+    129900, 100, 3000, 50, 8000, 1000, false),
+  ('cashews-kaju', 'Whole Cashews W240', 'whole-cashews-w240', 'CSH-W240-001',
+    'Large, whole, premium grade cashews.', 'Grade W240 whole cashews, lightly processed.',
+    64900, 100, 5000, 50, 15000, 1500, true),
+  ('pistachios-pista', 'Roasted Salted Pistachios', 'roasted-salted-pistachios', 'PIS-RS-001',
+    'Roasted in-shell pistachios with a light salt coating.', 'California pistachios, roasted and lightly salted.',
+    79900, 100, 3000, 50, 10000, 1000, true),
+  ('walnuts-akhrot', 'Kashmiri Walnut Kernels', 'kashmiri-walnut-kernels', 'WAL-KK-001',
+    'Light-colored, premium walnut kernels.', 'Hand-shelled Kashmiri walnut kernels.',
+    89900, 100, 3000, 50, 9000, 1000, false),
+  ('raisins-kishmish', 'Green Seedless Raisins', 'green-seedless-raisins', 'RAI-GS-001',
+    'Naturally sweet, seedless green raisins.', 'Sun-dried seedless green raisins.',
+    24900, 100, 5000, 50, 25000, 2500, false),
+  ('dates-khajoor', 'Medjool Dates', 'medjool-dates', 'DAT-MDJ-001',
+    'Large, soft, caramel-like Medjool dates.', 'Premium Medjool dates, naturally sweet and soft.',
+    89900, 250, 5000, 50, 12000, 1200, true),
+  ('figs-anjeer', 'Afghani Dried Figs', 'afghani-dried-figs', 'FIG-AF-001',
+    'Soft, naturally sweet dried figs.', 'Sun-dried Afghani figs, no added sugar.',
+    79900, 100, 3000, 50, 8000, 800, false),
+  ('dried-apricots', 'Turkish Dried Apricots', 'turkish-dried-apricots', 'APR-TR-001',
+    'Soft and tangy sun-dried apricots.', 'Sulphur-free sun-dried Turkish apricots.',
+    54900, 100, 3000, 50, 9000, 900, false),
+  ('mixed-dry-fruits', 'Festive Mix', 'festive-mix', 'MIX-FEST-001',
+    'A curated mix of almonds, cashews, pistachios, and raisins.', 'Our signature festive mix, great for gifting.',
+    74900, 250, 5000, 50, 15000, 1500, true),
+  ('seeds', 'Roasted Pumpkin Seeds', 'roasted-pumpkin-seeds', 'SEED-PMP-001',
+    'Crunchy, protein-rich roasted pumpkin seeds.', 'Lightly roasted and salted pumpkin seeds.',
+    34900, 100, 3000, 50, 10000, 1000, false)
+) as p(category_slug, name, slug, sku, short_description, description,
+       price_per_kg_paise, min_order_weight_g, max_order_weight_g, weight_increment_g,
+       stock_weight_g, reorder_threshold_g, is_featured)
+join public.categories c on c.slug = p.category_slug
+on conflict (slug) do nothing;

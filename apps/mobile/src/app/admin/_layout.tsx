@@ -41,6 +41,7 @@ export default function AdminLayout() {
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="categories" options={{ title: 'Categories' }} />
       <Stack.Screen name="order/[id]" options={{ title: 'Order Details' }} />
       <Stack.Screen name="product/[id]" options={{ title: 'Edit Product' }} />
       <Stack.Screen name="product/new" options={{ title: 'New Product' }} />

@@ -1,11 +1,5 @@
-import { ScreenPlaceholder } from '@/components/screen-placeholder';
+import { AdminMoreScreen } from '@/screens/admin/more';
 
 export default function AdminMore() {
-  return (
-    <ScreenPlaceholder
-      title="More"
-      description="Store configuration, delivery zones, audit log, sign out."
-      phase="Arrives in Phase 5-7"
-    />
-  );
+  return <AdminMoreScreen />;
 }

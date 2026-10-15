@@ -1,11 +1,5 @@
-import { ScreenPlaceholder } from '@/components/screen-placeholder';
+import { NewProductScreen } from '@/screens/admin/products';
 
 export default function AdminNewProduct() {
-  return (
-    <ScreenPlaceholder
-      title="New Product"
-      description="Create a product with category, price, and stock."
-      phase="Arrives in Phase 3"
-    />
-  );
+  return <NewProductScreen />;
 }

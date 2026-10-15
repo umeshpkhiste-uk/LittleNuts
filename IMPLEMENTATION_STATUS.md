@@ -169,7 +169,82 @@ Deferred / explicitly not done yet:
   `SIGNED_OUT` event on expiry, which currently just routes like any
   other sign-out.
 
-## Phase 3 — Product catalog & cart: NOT STARTED
+## Phase 3 — Product catalog & cart: DONE
+
+What was built:
+
+- Migration (`20261015190150_catalog_and_cart.sql`): `categories`, `products`,
+  `carts`, `cart_items`, all with RLS, plus a `product-images` Storage
+  bucket (public read, admin-only write). Catalog is publicly browsable —
+  anon and authenticated both see active categories/products; writes are
+  admin-only via `private.is_admin()`. Carts are per-user (one cart per
+  user, lazily upserted) and require authentication; `cart_items` ownership
+  is enforced via a join back to `carts.user_id`. Adding to cart never
+  touches `products.stock_weight_g` (spec section 9 — cart is not a stock
+  reservation).
+- `supabase/seed.sql`: the 10 starter categories from spec section 3 plus
+  11 sample products (illustrative pricing/stock), idempotent. Not
+  "hardcoding the catalog" — every row is a normal, fully admin-editable
+  row, just a reasonable starting point.
+- `packages/shared` is now actually wired into the app (`@littlenuts/shared`
+  via a `file:` dependency + npm symlink — confirmed Metro resolves it fine
+  without extra monorepo config) and extended with `weight.ts`
+  (`formatWeight`, `clampToIncrement`, `isValidQuantity`) and `types.ts`
+  (`Category`, `Product`, `CartItem` row shapes).
+- Customer: Home (categories row + featured products), Categories tab,
+  category product listing (new route), Search (text + category filter),
+  Product Details (image, weight presets filtered to the product's
+  min/max/increment, custom-grams input, live price via
+  `itemSubtotalPaise`, add-to-cart that redirects to login if signed out),
+  and a real Cart tab (quantity steppers, remove, subtotal, persisted via
+  `carts`/`cart_items`).
+- Admin: Products tab (search, stock/active/featured badges), new/edit
+  product form (category picker, pricing in ₹ converted to paise, weight
+  rules, stock, reorder threshold, active/featured toggles, image upload
+  via `expo-image-picker` → `expo-file-system`'s `File.arrayBuffer()` →
+  Supabase Storage), and a lightweight Categories screen (add category,
+  toggle active) reachable from the admin "More" tab, which also now has a
+  working Sign Out.
+
+Verified (all passing):
+
+- `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor` (21/21), `npx expo
+  export --platform android` — all clean.
+- `supabase db advisors --linked --type all` — no issues.
+- Live backend checks: anonymous REST reads return the real seeded
+  categories/products; an anonymous attempt to INSERT a product is
+  rejected by RLS (`42501`); anonymous reads of `carts`/`cart_items`
+  return nothing. Cart RLS was exercised directly in Postgres (two real
+  `auth.users` rows created solely for the test, `request.jwt.claims` /
+  `role authenticated` simulated per the Postgres RLS testing pattern):
+  confirmed a user can read/write only their own cart, cannot see another
+  user's `cart_items` (the join-based ownership policy), and that a
+  non-admin authenticated user's attempt to change a product's price
+  silently matches zero rows (RLS filters it out, not an exception —
+  price confirmed unchanged) rather than succeeding. Test rows cleaned up
+  after.
+- Could not re-run the full signup→login flow end-to-end via the REST API
+  this phase (Supabase's default email provider hit its send-rate-limit
+  after Phase 2's test), hence the direct-SQL RLS simulation above as the
+  verification path instead.
+
+Not yet verified: the actual screens on-device (same constraint as prior
+phases). Run `npx expo start` and browse the seeded catalog, add to cart,
+and try the admin product form (once an admin account is set up per
+`supabase/grant_admin_role.sql`) to confirm the UI itself.
+
+Deferred / explicitly not done yet:
+
+- Price/stock revalidation at checkout and "price changed, confirm?" UX
+  (spec section 8) — lands with Phase 4's checkout flow, since it's
+  meaningless without an order to check against.
+- Sorting and availability/price-range filters on Search are not built —
+  only text + category filter. Worth adding if you want richer discovery
+  before Phase 8, but not blocking later phases.
+- Multiple product images (gallery) — the form currently uploads a single
+  image into `image_urls[0]`.
+- Admin category editing (rename, reorder, delete, image) beyond
+  create/toggle-active — same reasoning as above, not blocking.
 
 ## Phase 4 — Checkout & payments: NOT STARTED
 

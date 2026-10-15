@@ -1,11 +1,5 @@
-import { ScreenPlaceholder } from '@/components/screen-placeholder';
+import { SearchScreen } from '@/screens/search';
 
 export default function Search() {
-  return (
-    <ScreenPlaceholder
-      title="Search"
-      description="Search, category filters, price filters, and sorting."
-      phase="Arrives in Phase 3"
-    />
-  );
+  return <SearchScreen />;
 }
