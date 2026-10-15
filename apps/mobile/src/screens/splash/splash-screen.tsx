@@ -1,45 +1,21 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 import { Redirect } from 'expo-router';
 
-import { supabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppTheme } from '@/theme/theme-provider';
 import { spacing, typography } from '@/theme/tokens';
 
-// Splash / session-initialization screen (spec section 6, screen 1). Restores
-// any persisted Supabase session, then hands off to the customer app. Role
-// resolution and admin redirect logic are added in Phase 2 once `user_roles`
-// and the role-guard helpers exist.
+// Splash / session-initialization screen (spec section 6, screen 1). Session
+// restoration itself happens once, at the root, via useAuthListener — this
+// screen just waits for that to settle and then hands off to the customer
+// shell. Signed-in customers and admins both land in the customer app by
+// default; admins reach /admin explicitly via the Account screen's admin
+// login link, never an automatic redirect on launch.
 export function SplashScreen() {
   const theme = useAppTheme();
-  const { session, isInitializing, setSession, setInitializing } = useAuthStore();
-  const [ready, setReady] = useState(false);
+  const isInitializing = useAuthStore((state) => state.isInitializing);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    supabase.auth
-      .getSession()
-      .then(({ data }) => {
-        if (!isMounted) return;
-        setSession(data.session);
-      })
-      .catch((error) => {
-        console.warn('[splash] failed to restore session', error);
-      })
-      .finally(() => {
-        if (!isMounted) return;
-        setInitializing(false);
-        setReady(true);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [setSession, setInitializing]);
-
-  if (!ready || isInitializing) {
+  if (isInitializing) {
     return (
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <Image
@@ -53,9 +29,6 @@ export function SplashScreen() {
     );
   }
 
-  // Phase 1: no real auth flow yet, always land on the customer shell.
-  // Phase 2 adds: session ? role-based redirect : /auth/login
-  void session;
   return <Redirect href="/(customer)/(tabs)" />;
 }
 

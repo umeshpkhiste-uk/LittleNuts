@@ -7,9 +7,11 @@ type AuthState = {
   session: Session | null;
   role: AppRole | null;
   isInitializing: boolean;
+  isRoleLoading: boolean;
   setSession: (session: Session | null) => void;
   setRole: (role: AppRole | null) => void;
   setInitializing: (value: boolean) => void;
+  setRoleLoading: (value: boolean) => void;
   signOutLocal: () => void;
 };
 
@@ -22,8 +24,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   role: null,
   isInitializing: true,
+  isRoleLoading: true,
   setSession: (session) => set({ session }),
   setRole: (role) => set({ role }),
   setInitializing: (value) => set({ isInitializing: value }),
-  signOutLocal: () => set({ session: null, role: null }),
+  setRoleLoading: (value) => set({ isRoleLoading: value }),
+  signOutLocal: () => set({ session: null, role: null, isRoleLoading: false }),
 }));

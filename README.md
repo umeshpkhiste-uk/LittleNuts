@@ -29,10 +29,29 @@ Razorpay · Expo EAS (Android builds/release).
 
 ```bash
 cd apps/mobile
-cp ../../.env.example .env   # fill in Supabase/Razorpay values once provisioned (Phase 2+)
 npm install
 npx expo start
 ```
+
+`apps/mobile/.env` already exists (git-ignored) with the LittleNuts Supabase
+project's URL and publishable key — see `.env.example` at the repo root for
+what each variable is and which ones must never leave the server side.
+
+### Supabase (CLI-driven, not MCP)
+
+The Supabase MCP connector hits an environment bug here, so schema changes
+go through the CLI instead:
+
+```bash
+supabase login                                      # one-time, run in a real terminal
+supabase link --project-ref oaslejowibcvprddusbv     # one-time per machine
+supabase migration new <name>
+supabase db push --dry-run && supabase db push
+supabase db advisors --linked --type all
+```
+
+See `supabase/README.md` for the full workflow and the role-provisioning
+procedure (`supabase/grant_admin_role.sql`).
 
 Requires an Android emulator/device (or Expo Go, once native-module-free) to
 run. Use `npx expo run:android` for a development build once native modules

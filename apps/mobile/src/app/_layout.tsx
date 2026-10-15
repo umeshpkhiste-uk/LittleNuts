@@ -4,11 +4,15 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { useAuthListener } from '@/hooks/use-auth-listener';
+import { useRoleSync } from '@/hooks/use-role-sync';
 import { queryClient } from '@/lib/query-client';
 import { ThemeProvider, useAppTheme } from '@/theme/theme-provider';
 
 function RootStack() {
   const theme = useAppTheme();
+  useAuthListener();
+  useRoleSync();
 
   return (
     <>

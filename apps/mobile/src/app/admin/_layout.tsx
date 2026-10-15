@@ -1,15 +1,36 @@
+import { ActivityIndicator, View } from 'react-native';
 import { Stack } from 'expo-router';
 
+import { useRequireAdmin } from '@/lib/security/role-guard';
+import { useAuthStore } from '@/stores/auth-store';
 import { useAppTheme } from '@/theme/theme-provider';
 
-// Phase 2 wraps this layout with a role guard (src/lib/security) that
-// redirects to /auth/admin-login unless the authenticated user's role,
-// as resolved from the trusted `user_roles` table, is "admin". Every
-// screen under /admin also assumes server-side authorization on top of
-// this client-side gate (RLS + SECURITY DEFINER functions) — this guard
-// only improves navigation UX, per src/lib/security/README.md.
+// Client-side gate only — see src/lib/security/README.md. Every table and
+// function an admin screen touches is independently protected by RLS /
+// private.is_admin() on the backend (supabase/migrations), so this guard
+// existing or not changes nothing about what a non-admin can actually do.
 export default function AdminLayout() {
   const theme = useAppTheme();
+  useRequireAdmin();
+
+  const isInitializing = useAuthStore((state) => state.isInitializing);
+  const isRoleLoading = useAuthStore((state) => state.isRoleLoading);
+  const role = useAuthStore((state) => state.role);
+
+  if (isInitializing || isRoleLoading || role !== 'admin') {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: theme.background,
+        }}
+      >
+        <ActivityIndicator color={theme.primary} />
+      </View>
+    );
+  }
 
   return (
     <Stack

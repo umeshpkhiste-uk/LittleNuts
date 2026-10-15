@@ -1,6 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 
+import { PrimaryButton } from '@/components/primary-button';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/stores/auth-store';
 import { useAppTheme } from '@/theme/theme-provider';
 import { spacing, typography } from '@/theme/tokens';
 
@@ -12,15 +15,40 @@ import { spacing, typography } from '@/theme/tokens';
 // customer who isn't looking for it.
 export function AccountScreen() {
   const theme = useAppTheme();
+  const session = useAuthStore((state) => state.session);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.content}>
         <Text style={[styles.title, { color: theme.textPrimary }]}>Account</Text>
-        <Text style={[styles.description, { color: theme.textSecondary }]}>
-          Profile, addresses, and notifications will appear here once authentication is wired up
-          in Phase 2.
-        </Text>
+
+        {session ? (
+          <>
+            <Text style={[styles.description, { color: theme.textSecondary }]}>
+              Signed in as {session.user.email ?? session.user.phone}
+            </Text>
+            <Text style={[styles.description, { color: theme.textSecondary }]}>
+              Profile editing, addresses, and order history arrive in Phase 3.
+            </Text>
+            <PrimaryButton title="Sign Out" variant="secondary" onPress={handleSignOut} />
+          </>
+        ) : (
+          <>
+            <Text style={[styles.description, { color: theme.textSecondary }]}>
+              Log in to manage your addresses, place orders, and track deliveries.
+            </Text>
+            <PrimaryButton title="Log In" onPress={() => router.push('/auth/login')} />
+            <PrimaryButton
+              title="Create Account"
+              variant="secondary"
+              onPress={() => router.push('/auth/register')}
+            />
+          </>
+        )}
       </View>
 
       <Pressable
@@ -45,6 +73,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.md,
+    width: '100%',
   },
   title: {
     ...typography.h1,

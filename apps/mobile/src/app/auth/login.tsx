@@ -1,11 +1,5 @@
-import { ScreenPlaceholder } from '@/components/screen-placeholder';
+import { LoginScreen } from '@/screens/auth';
 
 export default function Login() {
-  return (
-    <ScreenPlaceholder
-      title="Log In"
-      description="Email/password or mobile OTP login."
-      phase="Arrives in Phase 2"
-    />
-  );
+  return <LoginScreen />;
 }

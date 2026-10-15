@@ -79,7 +79,95 @@ Deferred / explicitly not done yet (by design, future phases):
   square) and would be distorted if used directly as an adaptive icon —
   needs a proper square icon export before Phase 8 (release prep).
 
-## Phase 2 — Supabase & authentication: NOT STARTED
+## Phase 2 — Supabase & authentication: DONE
+
+Supabase project: **LittleNuts** (`oaslejowibcvprddusbv`, ap-northeast-1).
+The Supabase MCP connector hit an environment-specific OAuth bug
+("resource must be a valid MCP endpoint") that we couldn't resolve, so this
+phase was done via the Supabase CLI instead (`supabase link`, `supabase db
+push`, `supabase db advisors`) — see `supabase/README.md`.
+
+What was built:
+
+- Migrations (`supabase/migrations/`): `profiles`, `user_roles`,
+  `addresses`, all with RLS enabled. Role model: every user is implicitly
+  "customer"; only an explicit `role = 'admin'` row in `user_roles` grants
+  admin access, and that table has **no** insert/update/delete policy and
+  **no** privileges granted to `anon`/`authenticated` — a role can only be
+  assigned via a service-role connection (see `grant_admin_role.sql`).
+  `private.is_admin()` is the one SECURITY DEFINER helper later admin
+  policies/functions should reuse. A trigger on `auth.users`
+  (`on_auth_user_created`) creates each user's profile + default-customer
+  role row on signup — the standard Supabase pattern. `supabase db
+  advisors` reports zero issues after the schema landed.
+- `apps/mobile/.env` created (git-ignored) with the real project URL and
+  **publishable** key only — never the service-role/secret key.
+- Real auth wiring in the app:
+  - `useAuthListener` (mounted once at the root) subscribes to
+    `supabase.auth.onAuthStateChange` — single source of session truth,
+    covers startup restore and every later sign-in/out.
+  - `useRoleSync` re-derives `role` from `user_roles` via TanStack Query
+    whenever the session's user changes; never defaults to "customer" by
+    assumption without having asked the backend, and exposes an
+    `isRoleLoading` flag so the admin guard can't fire on a stale read.
+  - `useRequireAdmin` / `/admin/_layout.tsx`: client-side redirect to
+    `/auth/admin-login` for non-admins — documented everywhere as UX only,
+    not the security boundary (that's RLS + `private.is_admin()`).
+  - Login (`/auth/login`): real email/password via
+    `signInWithPassword`, plus a structured mobile-OTP tab
+    (`signInWithOtp` / `verifyOtp`) that will work as soon as an SMS
+    provider is configured in the Supabase dashboard — not simulated,
+    just currently unconfigured upstream (per your decision to structure
+    it now, wire the provider later).
+  - Register (`/auth/register`): real `signUp` with full name in user
+    metadata (consumed by the trigger), handles the
+    email-confirmation-required case correctly (no session back ⇒ "check
+    your email" screen, not a silent fake login).
+  - Admin login (`/auth/admin-login`): signs in, then independently
+    re-checks the caller's role from `user_roles` before ever navigating
+    to `/admin` — signs the session back out immediately if the account
+    isn't an admin.
+  - Account screen: real signed-in/signed-out state, working "Sign Out".
+- `supabase/grant_admin_role.sql`: manual (non-migration) script to
+  promote a signed-up user to admin, with placeholder email — documented
+  procedure since the two real admin emails aren't in version control.
+
+Verified (all passing):
+
+- `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor` (21/21), `npx expo
+  export --platform android` — all clean with the real Supabase env vars
+  loaded.
+- `supabase db advisors --linked --type all` — no issues.
+- End-to-end against the **live** project (via curl + `supabase db
+  query`, then cleaned up): signup creates a confirmed-pending user →
+  trigger correctly creates `profiles` + `user_roles` (role defaults to
+  `customer`) → anonymous REST requests to `profiles`/`user_roles` return
+  no rows → an anonymous attempt to INSERT `role: 'admin'` into
+  `user_roles` is rejected by RLS (`42501`) → login before email
+  confirmation is correctly rejected (`email_not_confirmed`), matching
+  the register screen's "check your email" branch.
+
+Not yet verified: the actual screens on-device (same constraint as Phase
+1 — no emulator/Xcode in this environment). The backend behavior above was
+verified directly against the live database/auth API, but you should run
+`npx expo start` and click through login/register/admin-login once to
+confirm the UI itself.
+
+Deferred / explicitly not done yet:
+
+- The two real admin accounts are not provisioned — run
+  `supabase/grant_admin_role.sql` yourself once they've signed up (needs
+  their real emails, which don't belong in this repo).
+- Mobile OTP is structurally complete but will error until an SMS
+  provider (e.g. Twilio, MSG91) is configured in the Supabase dashboard's
+  Auth settings.
+- Password recovery ("forgot password") screen is not built yet — not
+  blocking for Phase 2's stated deliverable but should land before release
+  (flagging for Phase 7 hardening or sooner if you want it now).
+- Session-expiration UX (e.g. a friendly re-login prompt vs. a raw error)
+  is not specially handled yet — `onAuthStateChange` will surface a
+  `SIGNED_OUT` event on expiry, which currently just routes like any
+  other sign-out.
 
 ## Phase 3 — Product catalog & cart: NOT STARTED
 
