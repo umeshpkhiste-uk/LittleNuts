@@ -2,6 +2,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Order, OrderItem, OrderStatus } from '@littlenuts/shared';
 
 import { supabase } from '@/lib/supabase/client';
+import { requestRazorpayRefund } from '@/lib/payments/razorpay-api';
+
+export type Refund = {
+  id: string;
+  order_id: string;
+  payment_attempt_id: string | null;
+  amount_paise: number;
+  reason: string;
+  status: 'pending' | 'processing' | 'processed' | 'failed';
+  provider_refund_id: string | null;
+  initiated_by: string;
+  failure_reason: string | null;
+  created_at: string;
+  processed_at: string | null;
+};
 
 export type AdminOrderTab =
   | 'new'
@@ -20,7 +35,14 @@ export function useAdminOrders(tab: AdminOrderTab) {
   return useQuery({
     queryKey: ['admin-orders', tab],
     queryFn: async () => {
-      const base = supabase.from('orders').select('*').order('created_at', { ascending: false });
+      // Capped rather than paginated for now — fine at current order
+      // volumes; revisit with real pagination before this limit is ever
+      // actually hit in production.
+      const base = supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200);
 
       const { data, error } = await (tab === 'new'
         ? base.eq('status', 'pending').neq('payment_status', 'paid')
@@ -133,6 +155,85 @@ export function useAdminCancelOrder() {
       invalidate(variables.orderId);
       // Cancelling restores stock, so product listings/stock figures go stale too.
       queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
+export function useOrderRefunds(orderId: string | undefined) {
+  return useQuery({
+    queryKey: ['order-refunds', orderId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('refunds')
+        .select('*')
+        .eq('order_id', orderId!)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as Refund[];
+    },
+    enabled: !!orderId,
+  });
+}
+
+export function useInitiateRefund() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      orderId,
+      amountPaise,
+      reason,
+    }: {
+      orderId: string;
+      amountPaise: number;
+      reason: string;
+    }) => {
+      const { data, error } = await supabase.rpc('initiate_refund', {
+        p_order_id: orderId,
+        p_amount_paise: amountPaise,
+        p_reason: reason,
+      });
+      if (error) throw error;
+      return data as Refund;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['order-refunds', variables.orderId] });
+      queryClient.invalidateQueries({ queryKey: ['admin-order', variables.orderId] });
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard-summary'] });
+    },
+  });
+}
+
+// Separate from useInitiateRefund because this step calls the
+// razorpay-refund Edge Function (the actual money movement), not a
+// database RPC — initiate_refund only records intent.
+export function useProcessRefund() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ refundId, orderId }: { refundId: string; orderId: string }) => {
+      return requestRazorpayRefund(refundId);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['order-refunds', variables.orderId] });
+      queryClient.invalidateQueries({ queryKey: ['admin-order', variables.orderId] });
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard-summary'] });
+    },
+  });
+}
+
+export function useRecordCodCollection() {
+  const invalidate = useInvalidateOrderQueries();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const { data, error } = await supabase.rpc('record_cod_collection', { p_order_id: orderId });
+      if (error) throw error;
+      return data as Order;
+    },
+    onSuccess: (_data, orderId) => {
+      invalidate(orderId);
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard-summary'] });
     },
   });
 }

@@ -105,6 +105,7 @@ export type Order = {
   rejection_reason: string | null;
   accepted_by: string | null;
   accepted_at: string | null;
+  cod_collected_at: string | null;
   created_at: string;
   updated_at: string;
 };

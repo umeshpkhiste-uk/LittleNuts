@@ -11,6 +11,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 import { corsHeaders } from '../_shared/cors.ts';
 import { hmacSha256Hex, timingSafeEqual } from '../_shared/hmac.ts';
+import { notify } from '../_shared/notify.ts';
 
 const RAZORPAY_KEY_SECRET = Deno.env.get('RAZORPAY_KEY_SECRET')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -117,18 +118,4 @@ function jsonResponse(body: unknown, status = 200): Response {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
-}
-
-async function notify(
-  client: ReturnType<typeof createClient>,
-  userId: string,
-  type: string,
-  title: string,
-  message: string,
-  orderId: string,
-) {
-  const { error } = await client
-    .from('notifications')
-    .insert({ user_id: userId, type, title, message, related_order_id: orderId });
-  if (error) console.error('Failed to insert notification', error);
 }

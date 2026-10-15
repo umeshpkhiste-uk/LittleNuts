@@ -19,6 +19,7 @@ export type AdminDashboardSummary = {
   low_stock_count: number;
   out_of_stock_count: number;
   payment_reconciliation_warning_count: number;
+  refund_pending_count: number;
 };
 
 export function useAdminDashboardSummary() {

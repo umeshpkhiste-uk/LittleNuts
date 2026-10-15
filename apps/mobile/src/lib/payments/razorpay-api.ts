@@ -30,3 +30,14 @@ export async function verifyRazorpayPayment(params: {
   if (data?.error) throw new Error(data.error);
   return data as { verified: boolean };
 }
+
+export async function requestRazorpayRefund(
+  refundId: string,
+): Promise<{ status: string; providerRefundId: string }> {
+  const { data, error } = await supabase.functions.invoke('razorpay-refund', {
+    body: { refundId },
+  });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return data as { status: string; providerRefundId: string };
+}

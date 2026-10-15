@@ -17,6 +17,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 import { corsHeaders } from '../_shared/cors.ts';
 import { hmacSha256Hex, timingSafeEqual } from '../_shared/hmac.ts';
+import { notify } from '../_shared/notify.ts';
 
 const RAZORPAY_WEBHOOK_SECRET = Deno.env.get('RAZORPAY_WEBHOOK_SECRET')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -66,7 +67,10 @@ Deno.serve(async (req) => {
 
   let payload: {
     event?: string;
-    payload?: { payment?: { entity?: { id?: string; order_id?: string } } };
+    payload?: {
+      payment?: { entity?: { id?: string; order_id?: string } };
+      refund?: { entity?: { id?: string; payment_id?: string; status?: string } };
+    };
   };
   try {
     payload = JSON.parse(rawBody);
@@ -77,15 +81,18 @@ Deno.serve(async (req) => {
 
   const eventType = payload.event ?? null;
   const paymentEntity = payload.payload?.payment?.entity;
+  const refundEntity = payload.payload?.refund?.entity;
 
   try {
     if (eventType === 'payment.captured' && paymentEntity?.order_id && paymentEntity.id) {
       await handlePaymentCaptured(supabase, paymentEntity.order_id, paymentEntity.id);
     } else if (eventType === 'payment.failed' && paymentEntity?.order_id) {
       await handlePaymentFailed(supabase, paymentEntity.order_id);
+    } else if (eventType === 'refund.processed' && refundEntity?.id) {
+      await handleRefundProcessed(supabase, refundEntity.id);
+    } else if (eventType === 'refund.failed' && refundEntity?.id) {
+      await handleRefundFailed(supabase, refundEntity.id);
     }
-    // Other event types (refunds, etc.) are accepted but not yet acted on
-    // — refund handling lands in Phase 7.
 
     await markEvent(supabase, eventId, eventType, 'processed');
     return new Response('OK', { status: 200 });
@@ -182,18 +189,74 @@ async function handlePaymentFailed(
   }
 }
 
-async function notify(
-  client: ReturnType<typeof createClient>,
-  userId: string,
-  type: string,
-  title: string,
-  message: string,
-  orderId: string,
-) {
-  const { error } = await client
-    .from('notifications')
-    .insert({ user_id: userId, type, title, message, related_order_id: orderId });
-  if (error) console.error('Failed to insert notification', error);
+async function handleRefundProcessed(supabase: ReturnType<typeof createClient>, refundId: string) {
+  const { data: refund } = await supabase
+    .from('refunds')
+    .select('id, order_id, status')
+    .eq('provider_refund_id', refundId)
+    .maybeSingle();
+  if (!refund || refund.status === 'processed') return;
+
+  await supabase
+    .from('refunds')
+    .update({ status: 'processed', processed_at: new Date().toISOString() })
+    .eq('id', refund.id);
+
+  await reconcileOrderRefundStatus(supabase, refund.order_id);
+}
+
+async function handleRefundFailed(supabase: ReturnType<typeof createClient>, refundId: string) {
+  const { data: refund } = await supabase
+    .from('refunds')
+    .select('id, order_id, status')
+    .eq('provider_refund_id', refundId)
+    .maybeSingle();
+  if (!refund || refund.status === 'processed' || refund.status === 'failed') return;
+
+  await supabase.from('refunds').update({ status: 'failed' }).eq('id', refund.id);
+
+  await reconcileOrderRefundStatus(supabase, refund.order_id);
+}
+
+// Recomputes an order's payment_status from the sum of its *processed*
+// refunds vs. the order total — the single source of truth both the
+// webhook and the razorpay-refund function use, so they can never
+// disagree about whether an order is now 'refunded' vs
+// 'partially_refunded' vs still 'paid'.
+async function reconcileOrderRefundStatus(supabase: ReturnType<typeof createClient>, orderId: string) {
+  const { data: order } = await supabase
+    .from('orders')
+    .select('id, user_id, order_number, total_paise, payment_status')
+    .eq('id', orderId)
+    .single();
+  if (!order) return;
+
+  const { data: processedRefunds } = await supabase
+    .from('refunds')
+    .select('amount_paise')
+    .eq('order_id', orderId)
+    .eq('status', 'processed');
+
+  const totalRefunded = (processedRefunds ?? []).reduce((sum, r) => sum + r.amount_paise, 0);
+
+  let newStatus = order.payment_status;
+  if (totalRefunded >= order.total_paise && totalRefunded > 0) {
+    newStatus = 'refunded';
+  } else if (totalRefunded > 0) {
+    newStatus = 'partially_refunded';
+  }
+
+  if (newStatus !== order.payment_status) {
+    await supabase.from('orders').update({ payment_status: newStatus }).eq('id', orderId);
+    await notify(
+      supabase,
+      order.user_id,
+      'refund_processed',
+      'Refund processed',
+      `A refund of ${totalRefunded / 100} for order ${order.order_number} has been processed.`,
+      orderId,
+    );
+  }
 }
 
 async function markEvent(

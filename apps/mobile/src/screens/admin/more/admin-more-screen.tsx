@@ -22,8 +22,17 @@ export function AdminMoreScreen() {
         <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
       </Pressable>
 
+      <Pressable
+        onPress={() => router.push('/admin/audit-log')}
+        style={[styles.row, { backgroundColor: theme.card, borderColor: theme.border }]}
+      >
+        <Text style={[styles.rowLabel, { color: theme.textPrimary }]}>Audit Log</Text>
+        <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
+      </Pressable>
+
       <Text style={[styles.note, { color: theme.textSecondary }]}>
-        Store configuration, delivery zones, and the admin audit log arrive in later phases.
+        Store configuration and delivery zones are still only editable via the Supabase SQL
+        Editor — no admin UI for them yet.
       </Text>
 
       <PrimaryButton

@@ -562,6 +562,162 @@ Deferred / explicitly not done yet:
   facing notifications inbox remain deferred (unchanged from Phase 5's
   list) — none are blocking for Phase 6's inventory/sync scope.
 
-## Phase 7 — Refunds & production hardening: NOT STARTED
+## Phase 7 — Refunds & production hardening: DONE (refund processing pending your Razorpay keys)
+
+### What was built
+
+**Migrations**:
+
+- `20261016120000_refunds_and_reconciliation.sql`:
+  - `refunds` table — one row per refund attempt against a paid online
+    order (`order_id`, `payment_attempt_id`, `amount_paise`, `reason`,
+    `status` pending/processing/processed/failed, `provider_refund_id`,
+    `initiated_by`, `failure_reason`, timestamps). Select policy mirrors
+    `payment_attempts` (own order or admin); no client insert/update —
+    written only by `initiate_refund()` and the service-role Edge
+    Functions below.
+  - `initiate_refund(order_id, amount_paise, reason)` — admin-only. Locks
+    the order, requires it be `razorpay`-paid (or already
+    partially-refunded/refund-pending), finds its successful
+    `payment_attempts` row, checks the requested amount doesn't exceed
+    `total_paise` minus whatever's already pending/processed, inserts the
+    `refunds` row, and flips the order to `refund_pending` immediately
+    (before any money has actually moved) so the dashboard surfaces it
+    right away.
+  - `reject_order` and `admin_cancel_order` re-created to flip
+    `payment_status` to `refund_pending` when the order being
+    rejected/cancelled had already been paid online — rejecting or
+    cancelling a paid order no longer silently leaves it looking `paid`
+    with nothing owed.
+  - COD collection confirmation — deferred in both Phase 5 and Phase 6's
+    notes ("COD revenue always shows ₹0... until that's added"). Added
+    `orders.cod_collected_at` and `record_cod_collection(order_id)`
+    (admin-only; requires `payment_method = 'cod'`, `status = 'delivered'`,
+    not already collected) which sets `payment_status = 'paid'` and stamps
+    the collection time.
+  - `get_admin_dashboard_summary` re-created: `today_cod_collected_paise`
+    now comes from real `cod_collected_at` rows instead of a hardcoded 0,
+    and a new `refund_pending_count` column surfaces orders currently
+    owing a refund.
+  - Performance: `orders_created_at_idx` and a partial
+    `orders_cod_collected_at_idx` (`where cod_collected_at is not null`)
+    for the dashboard's date-filtered queries.
+- `20261016130000_audit_log_realtime.sql` — adds `admin_audit_logs` to the
+  `supabase_realtime` publication for the new audit log viewer below.
+
+**Edge Functions**:
+
+- `razorpay-refund` (new) — called by the admin app after
+  `initiate_refund` has already recorded intent. Does an explicit
+  user-scoped admin check (reads the caller's own `user_roles` row — RLS
+  means a non-admin simply can't prove they're admin, independent of
+  whether `refunds_select_own_or_admin` would otherwise let them read the
+  row), then calls Razorpay's refund API with the key secret, and updates
+  `refunds`/`orders` from Razorpay's synchronous response. This mirrors
+  the existing create-order/verify-payment dual-path pattern: this
+  function's update is best-effort/synchronous, and `razorpay-webhook`'s
+  new `refund.processed`/`refund.failed` handling (below) is the
+  authoritative async confirmation, since Razorpay refunds often complete
+  asynchronously.
+- `razorpay-webhook` — added `refund.processed`/`refund.failed` handling,
+  keyed on `provider_refund_id`. Both paths (webhook and
+  `razorpay-refund`) recompute the order's `payment_status` from the sum
+  of its *processed* refunds vs. `total_paise` (`refunded` if fully
+  covered, `partially_refunded` otherwise), so the two code paths can
+  never disagree about the order's final state.
+- `_shared/notify.ts` — the `notify()` helper duplicated between
+  `razorpay-webhook` and `razorpay-verify-payment` was pulled out into a
+  shared module (used by both, plus the new `razorpay-refund`) — a small
+  cleanup fitting this phase's "error handling" hardening, not a new
+  feature.
+
+### What was built — mobile app
+
+- `use-admin-orders.ts`: `useOrderRefunds`, `useInitiateRefund`,
+  `useProcessRefund` (calls the `razorpay-refund` Edge Function, not a
+  database RPC — it's the actual money-movement step), and
+  `useRecordCodCollection`.
+- Admin order detail screen: a "Refunds" section (visible once an online
+  order is paid/refund_pending/partially_refunded) listing existing
+  refunds with a "Process via Razorpay" action per pending one, and a
+  "New Refund" form (amount + reason); a "Record Cash Collected" button on
+  delivered COD orders not yet collected.
+- Admin dashboard: a "refund(s) owe a refund" banner from the new
+  `refund_pending_count`, and the COD-revenue note rewritten now that
+  collection confirmation is real instead of "not built yet."
+- New admin **Audit Log** screen (`/admin/audit-log`, linked from the More
+  tab) — lists the last 100 `admin_audit_logs` rows with the acting
+  admin's name, action, entity, and metadata, live-updating via
+  `useRealtimeInvalidate`. This existed as a table with no UI since Phase
+  5; Phase 7's "monitoring" deliverable is what finally surfaces it.
+- `ErrorBoundary` (`src/components/error-boundary.tsx`) wraps the root
+  layout — catches render-time crashes and shows a retry screen instead of
+  a white screen. No crash-reporting service (Sentry/Bugsnag) is wired in
+  — there's no DSN available in this environment — so this is
+  render-crash containment only; wiring a real reporting service is a
+  release-blocker, not simulated here.
+- `useAdminOrders` now caps at 200 rows (`order by created_at desc
+  limit 200`) instead of fetching every order unbounded — a deliberate cap
+  rather than real pagination, which is fine at current order volumes but
+  flagged here so it isn't mistaken for a complete solution.
+- `packages/shared/src/types.ts`: added `cod_collected_at` to `Order`.
+
+**New committed test suite**: `supabase/tests/access_control_test.sql` —
+a rerunnable (not a migration) script exercising RLS and every admin-only
+function's access gate in one place: anon can't read any customer/admin
+table (but can still read the public catalog), customer B can't read or
+cancel customer A's data, a non-admin customer is rejected by name from
+every admin-only RPC (`accept_order`, `reject_order`,
+`update_order_status`, `admin_cancel_order`, `adjust_product_stock`,
+`initiate_refund`, `record_cod_collection`, `get_admin_dashboard_summary`),
+and an admin's calls are never blocked by the admin gate itself. Run with
+`supabase db query --linked --file supabase/tests/access_control_test.sql`
+— consolidates what every prior phase already verified ad hoc per-feature
+into one regression check to rerun before release.
+
+### Verified
+
+- `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor` (21/21), and
+  `npx expo export --platform android` (then removed `dist/`) all clean.
+- `supabase db advisors --linked --type all`: only the same
+  authenticated-callable-SECURITY-DEFINER-function warnings seen in every
+  prior phase, now also covering `initiate_refund` and
+  `record_cod_collection` — expected. `--type performance`: no issues
+  found.
+- `supabase/tests/access_control_test.sql` run against the linked
+  project: all checks passed, zero residue after cleanup (confirmed via a
+  follow-up count query).
+- Live functional verification against the linked project (simulated
+  sessions, cleaned up afterward, zero residue confirmed): `initiate_refund`
+  correctly flips an order to `refund_pending` and correctly rejects a
+  second refund that would exceed the remaining balance; simulating the
+  webhook's completion (service-role update, same as the real
+  `razorpay-webhook`/`razorpay-refund` code path) correctly lands on
+  `refunded`; `record_cod_collection` correctly marks a delivered COD
+  order paid and correctly rejects being called twice; the dashboard's
+  `today_cod_collected_paise` correctly reflects the collected amount.
+- `razorpay-webhook` redeployed and reconfirmed still reachable without a
+  JWT (`400` on a signature-less request, not `401`) after picking up the
+  shared `notify()` import and the refund handlers.
+
+### Not yet verified / deferred
+
+- The actual Razorpay refund API call (`razorpay-refund` function) is
+  structurally complete and deployed but not live-tested end-to-end —
+  same standing gap as the rest of the Razorpay integration, pending your
+  test Key ID/Secret/Webhook Secret (noted since Phase 4). The DB-side
+  half of the workflow (`initiate_refund`, status tracking, dashboard
+  reconciliation) is fully verified; only the live HTTP call to Razorpay's
+  refund endpoint and the resulting webhook round-trip are not.
+- On-device testing of the new screens (Refunds section, Audit Log,
+  Record Cash Collected, the error boundary's actual fallback UI) —
+  same standing emulator/device limitation noted every phase.
+- No real crash-reporting/monitoring service (Sentry, Bugsnag, or
+  Supabase's own log drains) is wired up — `ErrorBoundary` only prevents a
+  white screen locally; there's no credential available in this
+  environment to configure one. This should be set up before Phase 8's
+  release.
+- Store settings admin UI and a customer-facing notifications inbox
+  remain deferred (unchanged from Phase 5/6's list).
 
 ## Phase 8 — Release: NOT STARTED

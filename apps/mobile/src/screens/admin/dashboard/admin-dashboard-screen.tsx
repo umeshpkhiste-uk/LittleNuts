@@ -48,6 +48,12 @@ export function AdminDashboardScreen() {
         </Text>
       ) : null}
 
+      {data.refund_pending_count > 0 ? (
+        <Text style={[styles.warningCallout, { backgroundColor: theme.danger }]}>
+          {data.refund_pending_count} order{data.refund_pending_count === 1 ? '' : 's'} owe a refund
+        </Text>
+      ) : null}
+
       <View style={styles.grid}>
         <StatCard label="Today's Orders" value={String(data.today_order_count)} theme={theme} />
         <StatCard label="New" value={String(data.pending_count)} theme={theme} />
@@ -92,8 +98,8 @@ export function AdminDashboardScreen() {
         />
       </View>
       <Text style={[styles.note, { color: theme.textSecondary }]}>
-        COD collection confirmation isn&apos;t built yet, so COD revenue always shows ₹0 here —
-        placed COD orders are not counted as realized until that&apos;s added.
+        COD revenue above counts only orders marked collected (&quot;Record Cash Collected&quot; on a
+        delivered COD order&apos;s detail screen) — a placed COD order isn&apos;t counted until then.
       </Text>
 
       <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>Inventory</Text>

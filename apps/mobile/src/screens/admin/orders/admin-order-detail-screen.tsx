@@ -9,6 +9,10 @@ import {
   useAcceptOrder,
   useAdminCancelOrder,
   useAdminOrder,
+  useInitiateRefund,
+  useOrderRefunds,
+  useProcessRefund,
+  useRecordCodCollection,
   useRejectOrder,
   useUpdateOrderStatus,
 } from '@/hooks/admin/use-admin-orders';
@@ -25,6 +29,7 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
 };
 
 const CANCELLABLE_STATUSES: OrderStatus[] = ['accepted', 'preparing', 'ready_for_dispatch'];
+const REFUNDABLE_PAYMENT_STATUSES = ['paid', 'refund_pending', 'partially_refunded'];
 
 export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
   const theme = useAppTheme();
@@ -33,6 +38,10 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
   const rejectOrder = useRejectOrder();
   const updateStatus = useUpdateOrderStatus();
   const cancelOrder = useAdminCancelOrder();
+  const refunds = useOrderRefunds(orderId);
+  const initiateRefund = useInitiateRefund();
+  const processRefund = useProcessRefund();
+  const recordCodCollection = useRecordCodCollection();
 
   useRealtimeInvalidate('orders', [['admin-order', orderId], ['admin-orders']]);
 
@@ -40,6 +49,9 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
   const [rejectionReason, setRejectionReason] = useState('');
   const [showCancelInput, setShowCancelInput] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [showRefundInput, setShowRefundInput] = useState(false);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   if (isLoading || !data) {
@@ -99,6 +111,45 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
       router.back();
     } catch (cancelError) {
       setError(cancelError instanceof Error ? cancelError.message : 'Could not cancel order.');
+    }
+  }
+
+  async function handleInitiateRefund() {
+    setError(null);
+    const amountPaise = Math.round(parseFloat(refundAmount) * 100);
+    if (!Number.isFinite(amountPaise) || amountPaise <= 0) {
+      setError('Enter a valid refund amount.');
+      return;
+    }
+    if (!refundReason.trim()) {
+      setError('A refund reason is required.');
+      return;
+    }
+    try {
+      await initiateRefund.mutateAsync({ orderId, amountPaise, reason: refundReason.trim() });
+      setRefundAmount('');
+      setRefundReason('');
+      setShowRefundInput(false);
+    } catch (refundError) {
+      setError(refundError instanceof Error ? refundError.message : 'Could not initiate refund.');
+    }
+  }
+
+  async function handleProcessRefund(refundId: string) {
+    setError(null);
+    try {
+      await processRefund.mutateAsync({ refundId, orderId });
+    } catch (processError) {
+      setError(processError instanceof Error ? processError.message : 'Could not process refund.');
+    }
+  }
+
+  async function handleRecordCodCollection() {
+    setError(null);
+    try {
+      await recordCodCollection.mutateAsync(orderId);
+    } catch (collectError) {
+      setError(collectError instanceof Error ? collectError.message : 'Could not record collection.');
     }
   }
 
@@ -165,7 +216,65 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
             Online payment not yet confirmed — consider waiting for payment before accepting.
           </Text>
         ) : null}
+
+        {order.payment_method === 'cod' && order.status === 'delivered' && !order.cod_collected_at ? (
+          <PrimaryButton
+            title="Record Cash Collected"
+            variant="secondary"
+            loading={recordCodCollection.isPending}
+            onPress={handleRecordCodCollection}
+          />
+        ) : null}
+        {order.cod_collected_at ? (
+          <Text style={[styles.text, { color: theme.textSecondary }]}>
+            Cash collected {new Date(order.cod_collected_at).toLocaleString('en-IN')}
+          </Text>
+        ) : null}
       </Section>
+
+      {order.payment_method === 'razorpay' && REFUNDABLE_PAYMENT_STATUSES.includes(order.payment_status) ? (
+        <Section title="Refunds">
+          {refunds.data?.map((refund) => (
+            <View key={refund.id} style={styles.refundRow}>
+              <Text style={[styles.text, { color: theme.textPrimary }]}>
+                {paiseToRupeesLabel(refund.amount_paise)} — {refund.status} ({refund.reason})
+              </Text>
+              {refund.status === 'pending' ? (
+                <PrimaryButton
+                  title="Process via Razorpay"
+                  variant="secondary"
+                  loading={processRefund.isPending}
+                  onPress={() => handleProcessRefund(refund.id)}
+                />
+              ) : null}
+            </View>
+          ))}
+
+          {showRefundInput ? (
+            <>
+              <FormTextInput
+                label="Refund amount (₹)"
+                value={refundAmount}
+                onChangeText={setRefundAmount}
+                keyboardType="decimal-pad"
+              />
+              <FormTextInput label="Reason" value={refundReason} onChangeText={setRefundReason} />
+              <PrimaryButton
+                title="Initiate Refund"
+                variant="secondary"
+                loading={initiateRefund.isPending}
+                onPress={handleInitiateRefund}
+              />
+            </>
+          ) : (
+            <PrimaryButton
+              title="New Refund"
+              variant="secondary"
+              onPress={() => setShowRefundInput(true)}
+            />
+          )}
+        </Section>
+      ) : null}
 
       {error ? <Text style={[styles.warning, { color: theme.danger }]}>{error}</Text> : null}
 
@@ -300,5 +409,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: 'transparent',
     paddingTop: spacing.md,
+  },
+  refundRow: {
+    gap: spacing.xs,
   },
 });
