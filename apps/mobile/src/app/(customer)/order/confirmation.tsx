@@ -1,11 +1,8 @@
-import { ScreenPlaceholder } from '@/components/screen-placeholder';
+import { useLocalSearchParams } from 'expo-router';
+
+import { OrderConfirmationScreen } from '@/screens/order-confirmation';
 
 export default function OrderConfirmation() {
-  return (
-    <ScreenPlaceholder
-      title="Order Placed!"
-      description="Thank you for your order. We'll deliver it soon."
-      phase="Arrives in Phase 4"
-    />
-  );
+  const { orderId } = useLocalSearchParams<{ orderId: string }>();
+  return <OrderConfirmationScreen orderId={orderId!} />;
 }

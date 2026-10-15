@@ -22,8 +22,6 @@ export default function CustomerLayout() {
       <Stack.Screen name="settings" options={{ title: 'Settings' }} />
       <Stack.Screen name="addresses/index" options={{ title: 'Addresses' }} />
       <Stack.Screen name="addresses/new" options={{ title: 'Add Address' }} />
-      <Stack.Screen name="payment/processing" options={{ title: 'Payment', headerShown: false }} />
-      <Stack.Screen name="payment/result" options={{ title: 'Payment Result', headerShown: false }} />
       <Stack.Screen
         name="order/confirmation"
         options={{ title: 'Order Confirmed', headerShown: false }}

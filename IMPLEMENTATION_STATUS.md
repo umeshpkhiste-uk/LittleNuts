@@ -246,7 +246,128 @@ Deferred / explicitly not done yet:
 - Admin category editing (rename, reorder, delete, image) beyond
   create/toggle-active — same reasoning as above, not blocking.
 
-## Phase 4 — Checkout & payments: NOT STARTED
+## Phase 4 — Checkout & payments: DONE (pending your Razorpay keys)
+
+What was built:
+
+- Migration (`20261015192101_orders_and_payments.sql`): `store_settings`
+  (singleton, admin-configurable delivery fee/tax/min-order/COD-and-online
+  toggles — spec section 3: "Do not hardcode commercial values"),
+  `orders`, `order_items`, `payment_attempts`, `payment_webhook_events`,
+  all with RLS. No table here grants `authenticated` INSERT/UPDATE at all
+  (except `store_settings`, admin-only) — every write goes through either
+  `public.create_order()` or the Edge Functions (service role).
+- `public.create_order(address_id, payment_method, idempotency_key,
+  customer_notes)`: the only way an order is created. Re-validates
+  everything from live data — cart contents, product active/price/stock
+  rules (row-locked during the read), the address, store settings — and
+  never trusts a client-sent price or total. Idempotent on
+  `(user_id, idempotency_key)`: a retried call returns the existing order
+  instead of erroring or duplicating (handles both the "check first" and
+  "lost the unique-constraint race" cases). Clears the cart only after the
+  order commits. Does not touch `products.stock_weight_g` — stock
+  deduction is Phase 6, on admin acceptance, exactly per spec section 12.
+  Lives in `public` (not `private`) specifically so it's callable via
+  `supabase.rpc()`; `supabase db advisors` flags this as a reviewed,
+  intentional finding (a SECURITY DEFINER function callable by
+  `authenticated` is unusual enough to warrant the linter's attention, but
+  here it's required and least-privilege: EXECUTE is revoked from `anon`).
+- Three Edge Functions (`supabase/functions/`), deployed and live:
+  - `razorpay-create-order`: looks up the (already-authoritative) order
+    via a user-scoped Supabase client (RLS enforces it's the caller's own
+    order), reuses an existing non-terminal payment attempt if one exists
+    (so retrying "start payment" doesn't create duplicate Razorpay
+    orders), otherwise calls the Razorpay Orders API with the service-role
+    secret and records a `payment_attempts` row.
+  - `razorpay-verify-payment`: recomputes the Razorpay signature
+    (`HMAC-SHA256("{order_id}|{payment_id}", key_secret)`) server-side and
+    only marks the payment/order `paid` if it matches — the client's
+    "success" callback is never trusted on its own (spec section 10).
+  - `razorpay-webhook`: public, deployed with `--no-verify-jwt` (Razorpay
+    has no Supabase session), authenticates via `X-Razorpay-Signature`
+    (HMAC-SHA256 of the **raw** body) and dedupes on the
+    `X-Razorpay-Event-Id` header into `payment_webhook_events` before any
+    processing — confirmed against Razorpay's current docs via WebFetch
+    (2026-10-16) rather than assumed from training data, including the
+    exact header names and `payload.payment.entity.{id,order_id}` paths.
+    This is the authoritative async path for when a customer pays but
+    never returns to the app.
+  - Live webhook URL (give this to Razorpay once configuring the
+    webhook): `https://oaslejowibcvprddusbv.supabase.co/functions/v1/razorpay-webhook`
+- App: real Checkout screen (address selection defaulting to the user's
+  default address, COD/online toggle gated by `store_settings`, live
+  order summary using the same paise math as the server), real Order
+  Confirmation, Order Details (status timeline, items, payment, address),
+  and a real My Orders list. `react-native-razorpay` wraps the native
+  checkout UI; its result is only ever treated as "pending verification,"
+  never as proof of payment.
+
+Verified (all passing):
+
+- `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor` (21/21), `npx expo
+  export --platform android` — all clean.
+- `supabase db advisors --linked --type all` — the one `create_order`
+  finding noted above, nothing else.
+- `create_order` was exercised directly against Postgres (two real
+  products, a real test address, simulated `authenticated` session): the
+  order was created with the correct computed subtotal (verified against
+  the known seed prices: ₹699×250g/1000 + ₹899×500g/1000 = ₹624.25),
+  delivery fee, and total; `order_items` snapshots matched; the cart was
+  cleared; and calling it again with the same idempotency key returned
+  the identical order id rather than creating a second one. Test data
+  cleaned up after (transactional — a scripting mistake mid-test rolled
+  back cleanly with zero residue, which is itself a useful confirmation
+  that these are real transactions).
+- Live REST checks: `anon` calling the `create_order` RPC is rejected
+  (`42501 permission denied for function create_order`); `anon` reading
+  `orders`/`payment_webhook_events` returns nothing; `anon` reading
+  `store_settings` correctly returns the public defaults. The deployed
+  `razorpay-create-order`/`razorpay-verify-payment` functions correctly
+  reject requests with no Authorization header (401, platform-level JWT
+  check); the `razorpay-webhook` function is reachable without a JWT and
+  correctly rejects a request with no signature headers (400).
+- Could not exercise the full Razorpay checkout → verify → webhook path
+  live, because there is no Razorpay account/test keys yet (see below) —
+  the signature verification logic was built directly from Razorpay's
+  current documentation rather than from memory.
+
+Not yet verified: the actual screens on-device, and the live Razorpay
+flow end-to-end (blocked on credentials below).
+
+**Needs your action:**
+
+1. Create a Razorpay account (razorpay.com), switch to **Test Mode**, and
+   generate a test Key ID + Key Secret (Settings → API Keys).
+2. Give me the Key ID (safe to share) — I'll put it in
+   `apps/mobile/.env` as `EXPO_PUBLIC_RAZORPAY_KEY_ID` (note: the app
+   doesn't actually need this client-side for checkout to work, since
+   `razorpay-create-order` returns the key id itself — it's only there
+   for completeness/documentation per spec section 22).
+3. Give me the Key Secret and I'll set it directly as an Edge Function
+   secret (`supabase secrets set RAZORPAY_KEY_SECRET=...`) — it never
+   touches this repo or the mobile app.
+4. Once you've created a webhook in the Razorpay dashboard pointing at
+   `https://oaslejowibcvprddusbv.supabase.co/functions/v1/razorpay-webhook`
+   (events: at least `payment.captured` and `payment.failed`), copy the
+   webhook secret it generates and give me that too, for
+   `RAZORPAY_WEBHOOK_SECRET`.
+5. After that, run `npx expo run:android` (not `expo start` — Razorpay's
+   native module needs a dev build, not Expo Go) and do a real test
+   checkout to confirm the end-to-end flow.
+
+Deferred / explicitly not done yet:
+
+- Price/stock "changed since you added it, confirm?" re-validation UX —
+  `create_order` already rejects an inactive product or invalid quantity
+  with a clear error, but the checkout screen doesn't yet show a
+  dedicated "price changed, please confirm" dialog distinct from a
+  generic error banner.
+- Refunds (Phase 7).
+- Payment reconciliation / stuck-paid-order escalation UI for admins
+  (Phase 5/6 — needs the admin dashboard first).
+- Delayed-webhook / retry-storm load testing — the idempotency mechanisms
+  are in place (unique `provider_event_id`, non-terminal-attempt reuse)
+  but only unit-level-verified, not load-tested.
 
 ## Phase 5 — Admin order management: NOT STARTED
 

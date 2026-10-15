@@ -13,8 +13,9 @@ in case it's fixed; it's a more convenient path when it works.
   — the order/payment/inventory ones land in Phases 4-6). Phase 2 added
   `profiles`, `user_roles`, and `addresses` with RLS.
 - `functions/` — Supabase Edge Functions for logic that must run with
-  secrets that can never ship in the mobile app: Razorpay order creation,
-  payment signature verification, webhook processing. Populated in Phase 4.
+  secrets that can never ship in the mobile app: `razorpay-create-order`,
+  `razorpay-verify-payment`, `razorpay-webhook` (deployed and live; see
+  "Payments" below for the secrets they still need).
 - `grant_admin_role.sql` — manual, non-migration script to promote a signed-up
   user to admin. Run in the Dashboard SQL Editor once each admin has an
   account (see the file for the full procedure).
@@ -34,6 +35,26 @@ supabase db advisors --linked --type all   # check for security/performance issu
 No local Docker/Postgres stack is used — migrations are written by hand and
 pushed straight to the hosted project. `supabase status` will report a
 docker error; that's expected and unrelated to `db push`.
+
+## Payments (Razorpay)
+
+Edge Functions are deployed (`supabase functions deploy <name> --use-api`
+— no Docker needed; `--no-verify-jwt` for `razorpay-webhook` only, since
+Razorpay calls it without a Supabase session). They need these secrets,
+set directly on the project (never in this repo):
+
+```bash
+supabase secrets set RAZORPAY_KEY_ID=rzp_test_...
+supabase secrets set RAZORPAY_KEY_SECRET=...
+supabase secrets set RAZORPAY_WEBHOOK_SECRET=...
+```
+
+`SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are
+injected automatically into every Edge Function — don't set those.
+
+Webhook URL to configure in the Razorpay dashboard (events:
+`payment.captured`, `payment.failed`):
+`https://oaslejowibcvprddusbv.supabase.co/functions/v1/razorpay-webhook`
 
 ## Role model
 

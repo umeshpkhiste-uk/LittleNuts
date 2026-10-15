@@ -31,8 +31,10 @@ export function AccountScreen() {
             <Text style={[styles.description, { color: theme.textSecondary }]}>
               Signed in as {session.user.email ?? session.user.phone}
             </Text>
+            <PrimaryButton title="My Addresses" onPress={() => router.push('/addresses')} />
+            <PrimaryButton title="My Orders" onPress={() => router.push('/(customer)/(tabs)/orders')} />
             <Text style={[styles.description, { color: theme.textSecondary }]}>
-              Profile editing, addresses, and order history arrive in Phase 3.
+              Profile editing arrives in a later phase.
             </Text>
             <PrimaryButton title="Sign Out" variant="secondary" onPress={handleSignOut} />
           </>

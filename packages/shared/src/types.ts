@@ -47,3 +47,76 @@ export type CartItem = {
 export type CartItemWithProduct = CartItem & {
   product: Product;
 };
+
+export type OrderStatus =
+  | 'pending'
+  | 'accepted'
+  | 'preparing'
+  | 'ready_for_dispatch'
+  | 'out_for_delivery'
+  | 'delivered'
+  | 'rejected'
+  | 'cancelled';
+
+export type PaymentMethod = 'razorpay' | 'cod';
+
+export type PaymentStatus =
+  | 'pending'
+  | 'authorized'
+  | 'paid'
+  | 'failed'
+  | 'cancelled'
+  | 'refund_pending'
+  | 'refunded'
+  | 'partially_refunded';
+
+export type AddressSnapshot = {
+  id: string;
+  recipient_name: string;
+  phone_number: string;
+  address_line_1: string;
+  address_line_2: string | null;
+  area: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  delivery_instructions: string | null;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Order = {
+  id: string;
+  order_number: string;
+  user_id: string;
+  address_snapshot: AddressSnapshot;
+  status: OrderStatus;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
+  subtotal_paise: number;
+  tax_paise: number;
+  delivery_fee_paise: number;
+  discount_paise: number;
+  total_paise: number;
+  idempotency_key: string;
+  customer_notes: string | null;
+  admin_notes: string | null;
+  rejection_reason: string | null;
+  accepted_by: string | null;
+  accepted_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OrderItem = {
+  id: string;
+  order_id: string;
+  product_id: string | null;
+  product_name_snapshot: string;
+  sku_snapshot: string;
+  unit_price_per_kg_paise: number;
+  quantity_g: number;
+  subtotal_paise: number;
+  created_at: string;
+};
