@@ -57,7 +57,9 @@ export function RegisterScreen() {
           We&apos;ve sent a confirmation link to your email address. Verify it, then log in.
         </Text>
         <Link href="/auth/login" asChild>
-          <Text style={[styles.link, { color: theme.primary }]}>Back to Log In</Text>
+          <Text style={StyleSheet.flatten([styles.link, { color: theme.primary }])}>
+            Back to Log In
+          </Text>
         </Link>
       </View>
     );
@@ -126,7 +128,7 @@ export function RegisterScreen() {
         </View>
 
         <Link href="/auth/login" asChild>
-          <Text style={[styles.link, { color: theme.primary }]}>
+          <Text style={StyleSheet.flatten([styles.link, { color: theme.primary }])}>
             Already have an account? Log in
           </Text>
         </Link>

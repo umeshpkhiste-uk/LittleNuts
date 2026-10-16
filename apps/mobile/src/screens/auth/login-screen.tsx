@@ -204,7 +204,7 @@ export function LoginScreen() {
         )}
 
         <Link href="/auth/register" asChild>
-          <Text style={[styles.link, { color: theme.primary }]}>
+          <Text style={StyleSheet.flatten([styles.link, { color: theme.primary }])}>
             Don&apos;t have an account? Create one
           </Text>
         </Link>
