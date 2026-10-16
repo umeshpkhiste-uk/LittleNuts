@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -5,15 +6,42 @@ import { router } from 'expo-router';
 import { CategoryCard } from '@/components/category-card';
 import { HomeHero } from '@/components/home-hero';
 import { ProductCard } from '@/components/product-card';
+import { type FilterGroup, TypeFilterChips } from '@/components/type-filter-chips';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
 import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
+// Which category slug belongs to which quick-filter chip. Categories not
+// listed here (none currently) would only show under "All".
+const GROUP_BY_SLUG: Record<string, FilterGroup> = {
+  'almonds-badam': 'nuts',
+  'cashews-kaju': 'nuts',
+  'pistachios-pista': 'nuts',
+  'walnuts-akhrot': 'nuts',
+  seeds: 'seeds',
+  'raisins-kishmish': 'dried-fruits',
+  'dates-khajoor': 'dried-fruits',
+  'figs-anjeer': 'dried-fruits',
+  'dried-apricots': 'dried-fruits',
+  'mixed-dry-fruits': 'mixes',
+};
+
 export function HomeScreen() {
   const theme = useAppTheme();
+  const [group, setGroup] = useState<FilterGroup>('all');
   const categories = useCategories();
   const featured = useProducts({ featuredOnly: true });
+
+  const visibleCategories = categories.data?.filter(
+    (category) => group === 'all' || GROUP_BY_SLUG[category.slug] === group,
+  );
+  const categoryIdToGroup = new Map(
+    categories.data?.map((category) => [category.id, GROUP_BY_SLUG[category.slug]]),
+  );
+  const visibleFeatured = featured.data?.filter(
+    (product) => group === 'all' || categoryIdToGroup.get(product.category_id) === group,
+  );
 
   return (
     <ScrollView
@@ -30,14 +58,17 @@ export function HomeScreen() {
         <Text style={[styles.searchPlaceholder, { color: theme.textSecondary }]}>
           Search for dry fruits...
         </Text>
+        <Ionicons name="options-outline" size={18} color={theme.textSecondary} />
       </Pressable>
+
+      <TypeFilterChips value={group} onChange={setGroup} />
 
       <Section title="Categories">
         {categories.isLoading ? (
           <ActivityIndicator color={theme.primary} />
         ) : (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-            {categories.data?.map((category) => (
+            {visibleCategories?.map((category) => (
               <CategoryCard
                 key={category.id}
                 category={category}
@@ -53,7 +84,7 @@ export function HomeScreen() {
           <ActivityIndicator color={theme.primary} />
         ) : (
           <View style={styles.grid}>
-            {featured.data?.map((product) => (
+            {visibleFeatured?.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -94,6 +125,7 @@ const styles = StyleSheet.create({
   },
   searchPlaceholder: {
     ...typography.body,
+    flex: 1,
   },
   section: {
     gap: spacing.sm,
