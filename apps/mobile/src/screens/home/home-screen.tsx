@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import { CategoryCard } from '@/components/category-card';
+import { HomeHero } from '@/components/home-hero';
 import { ProductCard } from '@/components/product-card';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
@@ -19,10 +20,7 @@ export function HomeScreen() {
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={styles.container}
     >
-      <Text style={[styles.title, { color: theme.textPrimary }]}>LittleNuts</Text>
-      <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-        Goodness in every bite — 100% natural dry fruits.
-      </Text>
+      <HomeHero />
 
       <Pressable
         onPress={() => router.push('/search')}
@@ -84,12 +82,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.lg,
     paddingBottom: spacing.xxl,
-  },
-  title: {
-    ...typography.display,
-  },
-  subtitle: {
-    ...typography.body,
   },
   searchBar: {
     flexDirection: 'row',
