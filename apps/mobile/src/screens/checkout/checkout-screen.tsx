@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { randomUUID } from 'expo-crypto';
 import { router } from 'expo-router';
 import {
@@ -49,9 +49,15 @@ export function CheckoutScreen() {
     addresses.data?.[0]?.id ??
     null;
 
+  // react-native-razorpay has no web implementation — the web build of
+  // this app (Vercel) offers Cash on Delivery only, never defaults to or
+  // offers the online option, so it can never attempt to open a checkout
+  // that doesn't exist on this platform.
+  const isWeb = Platform.OS === 'web';
+
   const paymentMethod: PaymentMethod =
     explicitPaymentMethod ??
-    (settings.data && !settings.data.cod_enabled && settings.data.online_payment_enabled
+    (!isWeb && settings.data && !settings.data.cod_enabled && settings.data.online_payment_enabled
       ? 'razorpay'
       : 'cod');
 
@@ -184,7 +190,7 @@ export function CheckoutScreen() {
                 onPress={() => setExplicitPaymentMethod('cod')}
               />
             ) : null}
-            {settings.data?.online_payment_enabled ? (
+            {!isWeb && settings.data?.online_payment_enabled ? (
               <PaymentOption
                 label="Pay Online (UPI/Card)"
                 active={paymentMethod === 'razorpay'}
@@ -192,6 +198,12 @@ export function CheckoutScreen() {
               />
             ) : null}
           </View>
+          {isWeb ? (
+            <Text style={[styles.body, { color: theme.textSecondary }]}>
+              Online payment is available in the Android app. The web version supports Cash on
+              Delivery only.
+            </Text>
+          ) : null}
         </Section>
 
         <Section title="Order Summary">
