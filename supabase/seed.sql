@@ -66,8 +66,25 @@ from (values
 join public.categories c on c.slug = p.category_slug
 on conflict (slug) do nothing;
 
--- Real product photo for the almond SKUs (uploaded to the public
--- product-images bucket); keeps the seed in sync with the live DB.
-update public.products
-set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/almonds.png']
-where slug in ('california-almonds', 'mamra-almonds');
+-- Real product/category photos (uploaded to the public product-images
+-- bucket); keeps the seed in sync with the live DB. No photo yet for
+-- turkish-dried-apricots / dried-apricots.
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/almonds.jpg' where slug = 'almonds-badam';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/cashews.jpg' where slug = 'cashews-kaju';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/pistachios.jpg' where slug = 'pistachios-pista';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/walnuts.jpg' where slug = 'walnuts-akhrot';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/raisins.jpg' where slug = 'raisins-kishmish';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/dates.jpg' where slug = 'dates-khajoor';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/figs.jpg' where slug = 'figs-anjeer';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/mixes.jpg' where slug = 'mixed-dry-fruits';
+update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/seeds.jpg' where slug = 'seeds';
+
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/almonds.jpg'] where slug in ('california-almonds', 'mamra-almonds');
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/cashews.jpg'] where slug = 'whole-cashews-w240';
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/pistachios.jpg'] where slug = 'roasted-salted-pistachios';
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/walnuts.jpg'] where slug = 'kashmiri-walnut-kernels';
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/raisins.jpg'] where slug = 'green-seedless-raisins';
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/dates.jpg'] where slug = 'medjool-dates';
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/figs.jpg'] where slug = 'afghani-dried-figs';
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/mixes.jpg'] where slug = 'festive-mix';
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/seeds.jpg'] where slug = 'roasted-pumpkin-seeds';
