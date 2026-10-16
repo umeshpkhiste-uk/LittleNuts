@@ -3,12 +3,13 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-import { CategoryCard } from '@/components/category-card';
 import { HomeHero } from '@/components/home-hero';
-import { ProductCard } from '@/components/product-card';
+import { HomeOfferCard } from '@/components/home-offer-card';
+import { TopPickCard } from '@/components/top-pick-card';
 import { type FilterGroup, TypeFilterChips } from '@/components/type-filter-chips';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
+import { palette } from '@/theme/colors';
 import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
@@ -33,9 +34,6 @@ export function HomeScreen() {
   const categories = useCategories();
   const featured = useProducts({ featuredOnly: true });
 
-  const visibleCategories = categories.data?.filter(
-    (category) => group === 'all' || GROUP_BY_SLUG[category.slug] === group,
-  );
   const categoryIdToGroup = new Map(
     categories.data?.map((category) => [category.id, GROUP_BY_SLUG[category.slug]]),
   );
@@ -63,29 +61,13 @@ export function HomeScreen() {
 
       <TypeFilterChips value={group} onChange={setGroup} />
 
-      <Section title="Categories">
-        {categories.isLoading ? (
-          <ActivityIndicator color={theme.primary} />
-        ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-            {visibleCategories?.map((category) => (
-              <CategoryCard
-                key={category.id}
-                category={category}
-                onPress={() => router.push(`/category/${category.id}`)}
-              />
-            ))}
-          </ScrollView>
-        )}
-      </Section>
-
-      <Section title="Top Picks For You">
+      <Section title="Top Picks For You" onViewAll={() => router.push('/search')}>
         {featured.isLoading ? (
           <ActivityIndicator color={theme.primary} />
         ) : (
           <View style={styles.grid}>
             {visibleFeatured?.map((product) => (
-              <ProductCard
+              <TopPickCard
                 key={product.id}
                 product={product}
                 onPress={() => router.push(`/product/${product.id}`)}
@@ -94,15 +76,32 @@ export function HomeScreen() {
           </View>
         )}
       </Section>
+
+      <HomeOfferCard />
     </ScrollView>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+  onViewAll,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onViewAll?: () => void;
+}) {
   const theme = useAppTheme();
   return (
     <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>{title}</Text>
+      <View style={styles.sectionHeader}>
+        <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>{title}</Text>
+        {onViewAll ? (
+          <Pressable onPress={onViewAll} hitSlop={8}>
+            <Text style={styles.viewAll}>View All</Text>
+          </Pressable>
+        ) : null}
+      </View>
       {children}
     </View>
   );
@@ -130,16 +129,23 @@ const styles = StyleSheet.create({
   section: {
     gap: spacing.sm,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   sectionTitle: {
     ...typography.h2,
   },
-  row: {
-    gap: spacing.md,
-    paddingRight: spacing.md,
+  viewAll: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: palette.gold,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.md,
+    justifyContent: 'space-between',
+    rowGap: spacing.md,
   },
 });
