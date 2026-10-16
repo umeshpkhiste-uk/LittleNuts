@@ -73,6 +73,14 @@ export function HomeScreen() {
                 onPress={() => router.push(`/product/${product.id}`)}
               />
             ))}
+            {/* space-between spreads an incomplete last row edge-to-edge,
+                leaving a big gap in the middle — pad it with invisible
+                spacers so the cards stay left-aligned at their normal size. */}
+            {Array.from({
+              length: (3 - ((visibleFeatured?.length ?? 0) % 3)) % 3,
+            }).map((_, index) => (
+              <View key={`spacer-${index}`} style={styles.gridSpacer} />
+            ))}
           </View>
         )}
       </Section>
@@ -147,5 +155,8 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     rowGap: spacing.md,
+  },
+  gridSpacer: {
+    width: '31%',
   },
 });

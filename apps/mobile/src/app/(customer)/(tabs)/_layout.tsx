@@ -3,6 +3,8 @@ import { Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
 
 import { GlassTabBarBackground } from '@/components/glass-tab-bar-background';
+import { useCart } from '@/hooks/cart/use-cart';
+import { palette } from '@/theme/colors';
 import { useAppTheme } from '@/theme/theme-provider';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -24,6 +26,8 @@ function tabIcon(active: IconName, inactive: IconName) {
 
 export default function CustomerTabsLayout() {
   const theme = useAppTheme();
+  const cart = useCart();
+  const cartCount = cart.data?.items.length ?? 0;
 
   return (
     <Tabs
@@ -56,7 +60,12 @@ export default function CustomerTabsLayout() {
       />
       <Tabs.Screen
         name="cart"
-        options={{ title: 'Cart', tabBarIcon: tabIcon('cart', 'cart-outline') }}
+        options={{
+          title: 'Cart',
+          tabBarIcon: tabIcon('cart', 'cart-outline'),
+          tabBarBadge: cartCount > 0 ? cartCount : undefined,
+          tabBarBadgeStyle: { backgroundColor: palette.gold, color: palette.navyBase },
+        }}
       />
       <Tabs.Screen
         name="account"

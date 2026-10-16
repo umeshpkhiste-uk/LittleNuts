@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +17,7 @@ import { radius, spacing, typography } from '@/theme/tokens';
 export function TopPickCard({ product, onPress }: { product: Product; onPress: () => void }) {
   const theme = useAppTheme();
   const addToCart = useAddToCart();
+  const [justAdded, setJustAdded] = useState(false);
   const displayWeight = product.min_order_weight_g;
   const price = itemSubtotalPaise(product.price_per_kg_paise, displayWeight);
   const imageUri = product.image_urls[0];
@@ -48,13 +50,19 @@ export function TopPickCard({ product, onPress }: { product: Product; onPress: (
               event.stopPropagation();
               if (!outOfStock) {
                 addToCart.mutate({ productId: product.id, quantityG: displayWeight });
+                setJustAdded(true);
+                setTimeout(() => setJustAdded(false), 1200);
               }
             }}
             disabled={outOfStock || addToCart.isPending}
             hitSlop={8}
             style={[styles.cartButton, outOfStock && styles.cartButtonDisabled]}
           >
-            <Ionicons name="cart" size={13} color={palette.navyBase} />
+            <Ionicons
+              name={justAdded ? 'checkmark' : 'cart'}
+              size={13}
+              color={palette.navyBase}
+            />
           </Pressable>
         </View>
       </GlassSurface>
