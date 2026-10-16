@@ -2,6 +2,7 @@ import { Component, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '@/components/primary-button';
+import { palette } from '@/theme/colors';
 import { spacing, typography } from '@/theme/tokens';
 
 type Props = { children: ReactNode };
@@ -46,14 +47,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.lg,
     gap: spacing.md,
-    backgroundColor: '#fff',
+    backgroundColor: palette.navyBase,
   },
   title: {
     ...typography.h1,
     textAlign: 'center',
+    color: palette.textPrimary,
   },
   message: {
     ...typography.body,
     textAlign: 'center',
+    color: palette.textSecondary,
   },
 });

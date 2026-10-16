@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
 
+import { GlassTabBarBackground } from '@/components/glass-tab-bar-background';
 import { useAppTheme } from '@/theme/theme-provider';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -30,10 +31,9 @@ export default function AdminTabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: theme.tabBarActive,
         tabBarInactiveTintColor: theme.tabBarInactive,
-        tabBarStyle: {
-          backgroundColor: theme.tabBarBackground,
-          borderTopColor: theme.border,
-        },
+        tabBarStyle: { backgroundColor: 'transparent', borderTopWidth: 0, elevation: 0 },
+        tabBarBackground: () => <GlassTabBarBackground />,
+        sceneStyle: { backgroundColor: theme.backgroundSolid },
       }}
     >
       <Tabs.Screen

@@ -829,3 +829,73 @@ code, config, and documentation are release-ready; the actual `eas build`
   copy, privacy policy text) was not produced — that's marketing/legal
   content for you to write or commission, not something to draft
   unprompted into the codebase.
+
+## Post-release: dark glassmorphism redesign
+
+Full visual redesign of both the customer and admin apps to the dark
+glassmorphism look from the user's reference mockup, replacing the
+previous cream/brown light-and-dark theme entirely (light mode is gone —
+there is now exactly one look).
+
+**Design system** (`src/theme/colors.ts`, `src/theme/tokens.ts`): a new
+dark-navy palette with a warm gold accent; `theme.background` is now
+`transparent` by design — the actual dark surface comes from
+`<AppBackground />` (new, `src/components/app-background.tsx`), a static
+gradient + soft gold glow blobs mounted once at the root
+(`src/app/_layout.tsx`), so every screen painting itself with
+`theme.background` reveals that shared glow instead of a flat color.
+
+**New primitives**: `GlassSurface` (`src/components/glass-surface.tsx`,
+real backdrop blur via the newly-added `expo-blur`, tint + border + glow
+shadow), `GlassHeaderBackground` and `GlassTabBarBackground` (same blur
+treatment for Stack headers and bottom tab bars, wired into all four
+navigator layouts — customer tabs/stack, admin tabs/stack, and auth).
+`PrimaryButton` is now a gold gradient pill (`expo-linear-gradient`,
+newly added) with a soft glow shadow; `FormTextInput`, `ProductCard`, and
+`CategoryCard` were rebuilt on `GlassSurface`.
+
+Because nearly every existing screen already read its colors from
+`useAppTheme()` rather than hardcoding them, this redesign cascaded to
+all ~27 customer and admin screens through the shared theme and
+components alone — almost no individual screen file needed editing.
+
+**Bugs found and fixed while verifying this, not present before**:
+
+- React Navigation's own default navigation theme (separate from our
+  app theme, previously masked by every screen's opaque
+  `theme.background`) paints an opaque `rgb(242,242,242)` behind the
+  whole app. Once `theme.background` became transparent this showed
+  through as a flat light-gray wash over everything. Fixed by wrapping
+  the root `<Stack>` in `expo-router`'s own exported `ThemeProvider` with
+  a custom theme (`colors.background: 'transparent'`) in
+  `src/app/_layout.tsx`.
+- Bottom tab navigators keep every tab's screen mounted and stacked at
+  the same position, relying on each one's opaque background to hide the
+  others; with every screen transparent by default, switching tabs
+  briefly bled the previous tab's content through behind the new one.
+  Fixed by giving both `Tabs` layouts (customer, admin) an opaque
+  `sceneStyle: { backgroundColor: theme.backgroundSolid }` — the shared
+  glow still shows on Stack screens (product detail, checkout, etc.,
+  which properly transition), just not stacked behind tabs.
+
+**Verified**: `npx tsc --noEmit`, `npx expo lint`, `npx expo-doctor`
+(21/21), and `npx expo export` for both `web` and `android` all clean.
+Visually verified via a local Playwright run against the dev web server
+(not just a build check) across both roles: customer — login, home,
+categories, search, product detail, cart, checkout, addresses, account,
+my orders; admin — dashboard, orders, products, more. All read cleanly
+as the intended dark-glass look with no layout bleed or contrast issues
+in any of those.
+
+**Also regenerated for this theme**: `android-icon-background.png` and
+both the Android adaptive icon and splash-screen `backgroundColor` in
+`app.json` (previously the old cream `#FDEBD5` from Phase 8's icon work;
+now the new navy `#0A0E17`) — the icon/splash foreground artwork (the
+brand medallion) is unchanged, only the color it sits on.
+
+**Not verified**: on-device/on-emulator appearance (same standing
+limitation as every prior phase — no device or emulator access in this
+environment); the Home screen's hero area does not use a photographic
+background like the reference mockup (no hero photo asset exists in the
+project — only the brand logo — so a gradient hero was used instead; a
+real photo could replace it later if one is supplied).

@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 
+import { GlassHeaderBackground } from '@/components/glass-header-background';
 import { useAppTheme } from '@/theme/theme-provider';
 
 export default function CustomerLayout() {
@@ -8,7 +9,9 @@ export default function CustomerLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: theme.surface },
+        headerStyle: { backgroundColor: 'transparent' },
+        headerShadowVisible: false,
+        headerBackground: () => <GlassHeaderBackground />,
         headerTintColor: theme.textPrimary,
         contentStyle: { backgroundColor: theme.background },
       }}

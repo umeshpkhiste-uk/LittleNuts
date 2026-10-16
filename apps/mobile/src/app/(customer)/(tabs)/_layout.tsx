@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
 
+import { GlassTabBarBackground } from '@/components/glass-tab-bar-background';
 import { useAppTheme } from '@/theme/theme-provider';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -30,10 +31,15 @@ export default function CustomerTabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: theme.tabBarActive,
         tabBarInactiveTintColor: theme.tabBarInactive,
-        tabBarStyle: {
-          backgroundColor: theme.tabBarBackground,
-          borderTopColor: theme.border,
-        },
+        tabBarStyle: { backgroundColor: 'transparent', borderTopWidth: 0, elevation: 0 },
+        tabBarBackground: () => <GlassTabBarBackground />,
+        // Bottom tabs keep every tab's scene mounted and stacked at the
+        // same position; with a transparent background (the app-wide
+        // default, see AppBackground) the inactive tabs behind the active
+        // one would bleed through. An opaque scene background per tab
+        // avoids that — the glow blobs still show on Stack screens
+        // (product detail, checkout, etc.), just not stacked behind tabs.
+        sceneStyle: { backgroundColor: theme.backgroundSolid },
       }}
     >
       <Tabs.Screen

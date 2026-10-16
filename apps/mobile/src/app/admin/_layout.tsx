@@ -1,6 +1,7 @@
 import { ActivityIndicator, View } from 'react-native';
 import { Stack } from 'expo-router';
 
+import { GlassHeaderBackground } from '@/components/glass-header-background';
 import { useRequireAdmin } from '@/lib/security/role-guard';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppTheme } from '@/theme/theme-provider';
@@ -35,7 +36,9 @@ export default function AdminLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: theme.surface },
+        headerStyle: { backgroundColor: 'transparent' },
+        headerShadowVisible: false,
+        headerBackground: () => <GlassHeaderBackground />,
         headerTintColor: theme.textPrimary,
         contentStyle: { backgroundColor: theme.background },
       }}

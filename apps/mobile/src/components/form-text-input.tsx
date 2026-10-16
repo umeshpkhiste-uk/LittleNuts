@@ -1,4 +1,5 @@
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
@@ -14,19 +15,14 @@ export function FormTextInput({ label, error, style, ...inputProps }: FormTextIn
   return (
     <View style={styles.container}>
       <Text style={[styles.label, { color: theme.textSecondary }]}>{label}</Text>
-      <TextInput
-        placeholderTextColor={theme.textSecondary}
-        style={[
-          styles.input,
-          {
-            backgroundColor: theme.surface,
-            borderColor: error ? theme.danger : theme.border,
-            color: theme.textPrimary,
-          },
-          style,
-        ]}
-        {...inputProps}
-      />
+      <View style={[styles.inputWrap, { borderColor: error ? theme.danger : theme.border }]}>
+        <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+        <TextInput
+          placeholderTextColor={theme.textMuted}
+          style={[styles.input, { color: theme.textPrimary }, style]}
+          {...inputProps}
+        />
+      </View>
       {error ? <Text style={[styles.error, { color: theme.danger }]}>{error}</Text> : null}
     </View>
   );
@@ -40,9 +36,13 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontWeight: '600',
   },
-  input: {
+  inputWrap: {
     borderWidth: 1,
     borderRadius: radius.md,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  input: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
     fontSize: 15,
