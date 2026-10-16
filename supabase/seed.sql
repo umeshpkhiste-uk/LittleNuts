@@ -65,3 +65,9 @@ from (values
        stock_weight_g, reorder_threshold_g, is_featured)
 join public.categories c on c.slug = p.category_slug
 on conflict (slug) do nothing;
+
+-- Real product photo for the almond SKUs (uploaded to the public
+-- product-images bucket); keeps the seed in sync with the live DB.
+update public.products
+set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/almonds.png']
+where slug in ('california-almonds', 'mamra-almonds');
