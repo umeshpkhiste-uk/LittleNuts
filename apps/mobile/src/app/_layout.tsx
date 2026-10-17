@@ -60,6 +60,7 @@ function RootStack() {
           }}
         >
           <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
           <Stack.Screen name="(customer)" />
           <Stack.Screen name="auth" />
           <Stack.Screen name="admin" />
