@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
 import { setHasAccount } from '@/lib/account-history';
+import { goBack } from '@/lib/go-back';
 import { clearSavedCredentials, getSavedCredentials, setSavedCredentials } from '@/lib/saved-credentials';
 import { showAlert } from '@/lib/show-alert';
 import { supabase } from '@/lib/supabase/client';
@@ -95,7 +96,7 @@ export function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           hitSlop={8}
           style={[styles.backButton, { borderColor: theme.border, backgroundColor: theme.card }]}
         >
