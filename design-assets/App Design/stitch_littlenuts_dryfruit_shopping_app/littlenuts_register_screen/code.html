@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>LittleNuts - Register Now</title>
+<!-- Tailwind CSS CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              charcoal: '#152420',
+              forest: '#1E3830',
+              primary: '#24443B',
+              accent: '#2F6B55',
+              cream: '#FCF9F4',
+              surface: '#F6F3EC',
+              sand: '#ECE7DD',
+              muted: '#7A847F',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 8px 30px rgba(27, 42, 38, 0.05)',
+            'input': '0 2px 4px rgba(27, 42, 38, 0.02)',
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="base-styling">
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background-color: #f3f0e8;
+    }
+    input::placeholder {
+      color: #9AA39E;
+    }
+    /* Hide default browser eye icon in Edge/IE */
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none;
+    }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 md:p-6 text-brand-charcoal">
+<!-- BEGIN: MobileDeviceContainer -->
+<!-- Constrained mobile canvas simulating an iOS device -->
+<div class="w-full max-w-[414px] bg-[#FCF9F4] min-h-screen md:min-h-[896px] md:h-auto md:rounded-[44px] shadow-2xl relative flex flex-col justify-between overflow-hidden border border-brand-sand/60">
+<!-- BEGIN: TopBarSection -->
+<header class="w-full pt-3 px-6 pb-2" data-purpose="status-and-nav-header">
+<!-- iOS Status Bar Simulation -->
+<div class="flex justify-between items-center text-xs font-semibold tracking-tight text-brand-charcoal pt-1 pb-3 select-none">
+<span class="pl-2 font-bold tracking-normal">9:41</span>
+<div class="flex items-center space-x-1.5 pr-2">
+<!-- Signal Icon -->
+<svg class="w-4 h-4 fill-current text-brand-charcoal" viewBox="0 0 24 24">
+<path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.25 18.33C2.86 16.54 2 14.37 2 12 2 6.48 6.48 2 12 2s10 4.48 10 10c0 2.37-.86 4.54-2.25 6.33l-.72-.72C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9zm0 4c-2.76 0-5 2.24-5 5 0 1.18.41 2.26 1.09 3.11l.73-.73C8.3 13.8 8 12.93 8 12c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .93-.3 1.8-.82 2.38l.73.73C16.59 14.26 17 13.18 17 12c0-2.76-2.24-5-5-5zm0 8a3 3 0 100-6 3 3 0 000 6z" opacity="0"></path>
+<rect height="5" rx="1" width="3" x="2" y="16"></rect>
+<rect height="9" rx="1" width="3" x="7" y="12"></rect>
+<rect height="13" rx="1" width="3" x="12" y="8"></rect>
+<rect height="17" rx="1" width="3" x="17" y="4"></rect>
+</svg>
+<!-- Wifi Icon -->
+<svg class="w-4 h-4 fill-current text-brand-charcoal" viewBox="0 0 24 24">
+<path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4zm0 3.5c3.55 0 6.78 1.4 9.17 3.68L12 18.25 2.83 11.18C5.22 8.9 8.45 7.5 12 7.5z"></path>
+</svg>
+<!-- Battery Icon -->
+<div class="flex items-center">
+<div class="w-5 h-2.5 border border-brand-charcoal rounded-[3px] p-0.5 flex items-center">
+<div class="bg-brand-charcoal h-full w-full rounded-[1px]"></div>
+</div>
+<div class="w-0.5 h-1 bg-brand-charcoal rounded-r-[1px] ml-[1px]"></div>
+</div>
+</div>
+</div>
+<!-- Navigation & Context Tag -->
+<div class="flex items-center justify-between mt-2">
+<!-- Back Arrow Button -->
+<button aria-label="Go back" class="w-10 h-10 rounded-full bg-white border border-brand-sand/80 flex items-center justify-center text-brand-charcoal shadow-sm hover:bg-brand-surface active:scale-95 transition-all" type="button">
+<svg class="w-5 h-5 text-brand-charcoal" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+<path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<!-- Brand/Flow Badge -->
+<div class="px-3 py-1 rounded-full bg-brand-sand/60 text-[11px] font-semibold text-brand-forest tracking-wider uppercase flex items-center space-x-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-accent"></span>
+<span class="">Auth • Register</span>
+</div>
+</div>
+</header>
+<!-- END: TopBarSection -->
+<!-- BEGIN: MainContentSection -->
+<main class="flex-1 px-6 pt-2 pb-6 overflow-y-auto">
+<!-- Typography Header -->
+<div class="mt-3 mb-6" data-purpose="heading-block">
+<h1 class="text-3xl font-extrabold text-brand-charcoal tracking-tight font-sans">
+          Register Now
+        </h1>
+<p class="text-brand-muted text-xs sm:text-sm font-medium mt-1.5 leading-relaxed">
+          Begin your healthy journey and get access to fresh handpicked dry fruits, organic superfoods and artisanal harvest.
+        </p>
+</div>
+<!-- Registration Form -->
+<form action="#" class="space-y-3.5" data-purpose="registration-form" method="POST" onsubmit="event.preventDefault();">
+<!-- Field 1: Full Name Input -->
+<div class="space-y-1">
+<div class="relative flex items-center">
+<span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-muted">
+<!-- User Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full py-3.5 pl-12 pr-4 bg-white text-sm font-medium rounded-2xl border border-brand-sand focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 outline-none text-brand-charcoal transition-all shadow-input" name="fullname" placeholder="Full Name" required="" type="text">
+</div>
+</div>
+<!-- Field 2: Email Address Input -->
+<div class="space-y-1">
+<div class="relative flex items-center">
+<span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-muted">
+<!-- Mail Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full py-3.5 pl-12 pr-4 bg-white text-sm font-medium rounded-2xl border border-brand-sand focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 outline-none text-brand-charcoal transition-all shadow-input" name="email" placeholder="Email Address" required="" type="email">
+</div>
+</div>
+<!-- Field 3: Password Input -->
+<div class="space-y-1">
+<div class="relative flex items-center">
+<span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-muted">
+<!-- Lock Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full py-3.5 pl-12 pr-11 bg-white text-sm font-medium rounded-2xl border border-brand-sand focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 outline-none text-brand-charcoal transition-all shadow-input" id="password" name="password" placeholder="Password" required="" type="password">
+<!-- Toggle Visibility Button -->
+<button aria-label="Toggle password visibility" class="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-muted hover:text-brand-charcoal focus:outline-none" onclick="togglePasswordVisibility('password', 'eyeIcon1')" type="button">
+<svg class="w-5 h-5" fill="none" id="eyeIcon1" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Field 4: Confirm Password Input -->
+<div class="space-y-1">
+<div class="relative flex items-center">
+<span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-muted">
+<!-- Lock Icon -->
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full py-3.5 pl-12 pr-11 bg-white text-sm font-medium rounded-2xl border border-brand-sand focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 outline-none text-brand-charcoal transition-all shadow-input" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required="" type="password">
+<!-- Toggle Visibility Button -->
+<button aria-label="Toggle confirm password visibility" class="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-muted hover:text-brand-charcoal focus:outline-none" onclick="togglePasswordVisibility('confirmPassword', 'eyeIcon2')" type="button">
+<svg class="w-5 h-5" fill="none" id="eyeIcon2" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Primary Action Button: Sign Up / Create Account -->
+<div class="pt-2">
+<button class="w-full py-3.5 px-4 bg-brand-charcoal hover:bg-brand-forest active:scale-[0.99] text-white text-base font-semibold rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-2" type="submit">
+<span class="">Create Account</span>
+<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+<path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</form>
+<!-- BEGIN: SocialAuthSection -->
+<section class="mt-5 space-y-4" data-purpose="social-login">
+<!-- Divider -->
+<div class="relative flex items-center justify-center">
+<div class="border-t border-brand-sand w-full"></div>
+<span class="bg-[#FCF9F4] px-4 text-xs font-semibold text-brand-muted tracking-wide uppercase">
+            Or continue with
+          </span>
+<div class="border-t border-brand-sand w-full"></div>
+</div>
+<!-- Social Buttons Container -->
+<div class="space-y-2.5">
+<!-- Google Auth Button -->
+<button class="w-full py-3 px-4 bg-white hover:bg-brand-surface border border-brand-sand rounded-2xl flex items-center justify-center space-x-3 text-sm font-semibold text-brand-charcoal shadow-sm active:scale-[0.99] transition-all" type="button">
+<!-- Google Multicolor 'G' Icon -->
+<svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span class="">Continue with Google</span>
+</button>
+<!-- Apple Auth Button -->
+
+</div>
+</section>
+<!-- END: SocialAuthSection -->
+</main>
+<!-- END: MainContentSection -->
+<!-- BEGIN: FooterSection -->
+<footer class="p-5 text-center border-t border-brand-sand/40 bg-[#FCF9F4]" data-purpose="auth-footer-navigation">
+<p class="text-xs sm:text-sm text-brand-muted font-medium">
+        Already have an account? 
+        <a class="text-brand-accent hover:text-brand-forest font-bold ml-1 inline-flex items-center hover:underline focus:outline-none" href="#signin">
+          Sign In.
+        </a>
+</p>
+<!-- iOS Home Indicator -->
+<div class="mt-4 flex justify-center">
+<div class="w-32 h-1 bg-brand-charcoal/20 rounded-full"></div>
+</div>
+</footer>
+<!-- END: FooterSection -->
+</div>
+<!-- END: MobileDeviceContainer -->
+<!-- BEGIN: InteractiveScripts -->
+<script data-purpose="password-toggle">
+    /**
+     * Toggles the visibility of password inputs and updates the corresponding eye icon.
+     * @param {string} inputId - ID of the target password input field
+     * @param {string} iconId - ID of the target SVG icon
+     */
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      
+      if (!input || !icon) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        // Eye off icon
+        icon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+        `;
+      } else {
+        input.type = 'password';
+        // Standard eye open icon
+        icon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        `;
+      }
+    }
+  </script>
+<!-- END: InteractiveScripts -->
+
+
+</body></html>

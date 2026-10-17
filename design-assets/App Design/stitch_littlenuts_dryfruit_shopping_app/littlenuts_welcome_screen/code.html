@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>LittleNuts - Welcome to Artisanal Harvest</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cream: '#FCF9F4',
+              softSand: '#F5EFE6',
+              deepForest: '#172B23',
+              forestHover: '#0F1D17',
+              gold: '#D4A373',
+              pistachio: '#798E6E',
+              nutBrown: '#8D5B4C',
+              muted: '#717D77'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          boxShadow: {
+            'card-float': '0 20px 40px -15px rgba(23, 43, 35, 0.08)',
+            'btn-shadow': '0 10px 24px -6px rgba(23, 43, 35, 0.35)',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background-color: #E5E5E5;
+    }
+    /* Hide scrollbars for app-shell experience */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+<style data-purpose="decorative-animations">
+    @keyframes floatGentle {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-5px) rotate(1deg); }
+    }
+    .animate-float {
+      animation: floatGentle 4.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-0 sm:p-4 bg-stone-200">
+<!-- BEGIN: MobileDeviceFrame -->
+<main class="relative w-full max-w-[393px] h-[852px] bg-[#FCF9F4] text-[#172B23] overflow-hidden flex flex-col justify-between shadow-2xl sm:rounded-[48px] border-stone-300 sm:border-[8px]">
+<!-- BEGIN: TopHeaderSection -->
+<header class="w-full pt-3 px-7 z-20">
+<!-- iOS Status Bar -->
+<div class="flex justify-between items-center text-[#172B23] font-semibold text-sm tracking-tight mb-2" data-purpose="ios-status-bar">
+<span class="font-bold text-[15px] pl-1">9:41</span>
+<!-- Dynamic Island / Speaker notch placeholder -->
+<div class="w-24 h-4 bg-black rounded-full hidden sm:block opacity-10"></div>
+<div class="flex items-center space-x-2 text-xs">
+<!-- Signal Icon -->
+<svg class="w-4 h-4 fill-current" viewbox="0 0 24 24">
+<path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.2.2-.2.51 0 .71.1.1.23.15.35.15s.26-.05.35-.15l1.83-1.83C8.44 19.38 10.15 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-1.42 0-2.73-.42-3.83-1.15l1.62-1.62c.67.49 1.48.77 2.21.77 2.21 0 4-1.79 4-4s-1.79-4-4-4c-.73 0-1.54.28-2.21.77L8.17 8.15C9.27 7.42 10.58 7 12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5z"></path>
+</svg>
+<!-- Wifi Icon -->
+<svg class="w-4 h-4 fill-current" viewbox="0 0 24 24">
+<path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4zm0 3.5c3.78 0 7.22 1.48 9.77 3.89L12 18.5 2.23 11.39C4.78 8.98 8.22 7.5 12 7.5z"></path>
+</svg>
+<!-- Battery Icon -->
+<div class="flex items-center space-x-0.5">
+<div class="w-5 h-2.5 border border-current rounded-sm p-0.5 flex items-center">
+<div class="w-3 h-1.5 bg-current rounded-2xs"></div>
+</div>
+<div class="w-0.5 h-1 bg-current rounded-r-xs"></div>
+</div>
+</div>
+</div>
+<!-- Sequence Identifier Badge -->
+<div class="flex items-center justify-between mt-2 pt-1">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#172B23]/5 text-[#172B23] text-[11px] font-bold tracking-wider uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-[#798E6E] animate-pulse"></span>
+          ONBOARDING • Welcome
+        </span>
+<button aria-label="Skip to content" class="text-xs font-semibold text-brand-muted hover:text-brand-deepForest transition-colors" type="button">
+          Skip
+        </button>
+</div>
+</header>
+<!-- END: TopHeaderSection -->
+<!-- BEGIN: HeroVisualSection -->
+<section class="relative flex-1 flex flex-col items-center justify-center px-6" data-purpose="hero-illustration-container">
+<!-- Atmospheric Backdrop Glows -->
+<div class="absolute w-72 h-72 rounded-full bg-[#EBDBC9]/50 filter blur-3xl -z-10"></div>
+<div class="absolute w-44 h-44 rounded-full bg-[#E2EBD8]/60 filter blur-2xl top-12 right-6 -z-10"></div>
+<!-- Hero Visual Artboard Card -->
+<div class="relative w-full max-w-[310px] aspect-square rounded-[36px] bg-gradient-to-b from-white/90 via-white/70 to-[#F6EFE6]/90 p-5 shadow-card-float border border-white/80 flex items-center justify-center overflow-hidden animate-float">
+<!-- Decorative Floating Organic Badges -->
+<div class="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md shadow-sm border border-stone-100">
+<span class="text-xs">🌰</span>
+<span class="text-[11px] font-bold text-[#172B23] tracking-tight">100% Sun-Dried</span>
+</div>
+<div class="absolute bottom-4 right-4 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#172B23] text-white shadow-sm">
+<svg class="w-3 h-3 text-[#D4A373] fill-current" viewbox="0 0 20 20">
+<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+</svg>
+<span class="text-[10px] font-bold tracking-wider uppercase">Artisanal Grade</span>
+</div>
+<!-- Dry Fruit & Nut Arrangement Vector Artwork -->
+<svg class="w-full h-full drop-shadow-md select-none" fill="none" viewbox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialgradient cx="40%" cy="30%" id="almondGrad" r="70%">
+<stop offset="0%" stop-color="#E5AF82"></stop>
+<stop offset="60%" stop-color="#B7733B"></stop>
+<stop offset="100%" stop-color="#7B4219"></stop>
+</radialgradient>
+<radialgradient cx="30%" cy="30%" id="cashewGrad" r="75%">
+<stop offset="0%" stop-color="#FFF5E5"></stop>
+<stop offset="70%" stop-color="#E5CA9E"></stop>
+<stop offset="100%" stop-color="#C59B62"></stop>
+</radialgradient>
+<radialgradient cx="35%" cy="30%" id="walnutGrad" r="70%">
+<stop offset="0%" stop-color="#DDB288"></stop>
+<stop offset="60%" stop-color="#9C663C"></stop>
+<stop offset="100%" stop-color="#603716"></stop>
+</radialgradient>
+<radialgradient cx="30%" cy="30%" id="pistaShell" r="70%">
+<stop offset="0%" stop-color="#EFE2CD"></stop>
+<stop offset="85%" stop-color="#C8B291"></stop>
+</radialgradient>
+<radialgradient cx="40%" cy="30%" id="pistaKernel" r="70%">
+<stop offset="0%" stop-color="#A5C85A"></stop>
+<stop offset="65%" stop-color="#6B9834"></stop>
+<stop offset="100%" stop-color="#833C57"></stop>
+</radialgradient>
+<radialgradient cx="35%" cy="30%" id="dateGrad" r="70%">
+<stop offset="0%" stop-color="#883B32"></stop>
+<stop offset="70%" stop-color="#4C1A17"></stop>
+<stop offset="100%" stop-color="#2C0C0B"></stop>
+</radialgradient>
+<filter height="130%" id="nutShadow" width="130%" x="-10%" y="-10%">
+<fedropshadow dx="0" dy="6" flood-color="#3C2415" flood-opacity="0.18" stddeviation="5"></fedropshadow>
+</filter>
+</defs>
+<!-- Shadow Platform -->
+<ellipse cx="170" cy="272" fill="#2E2016" fill-opacity="0.08" rx="100" ry="20"></ellipse>
+<!-- Botanical Leaves in Background -->
+<g opacity="0.85">
+<path d="M90 145 C60 115, 60 70, 95 65 C115 95, 110 135, 90 145Z" fill="#758B6F"></path>
+<path d="M88 143 C80 110, 85 85, 95 65" stroke="#4F644A" stroke-linecap="round" stroke-width="2"></path>
+<path d="M245 130 C280 100, 290 60, 260 50 C235 75, 230 115, 245 130Z" fill="#8CA483"></path>
+<path d="M247 128 C260 100, 260 75, 260 50" stroke="#5E7556" stroke-linecap="round" stroke-width="2"></path>
+</g>
+<!-- Organic Medjool Date (Left Base) -->
+<g filter="url(#nutShadow)">
+<ellipse cx="112" cy="216" fill="url(#dateGrad)" rx="34" ry="24" transform="rotate(-28 112 216)"></ellipse>
+<path d="M96 204 C106 200, 124 206, 126 218" opacity="0.4" stroke="#D18379" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M92 220 C102 215, 118 222, 122 230" opacity="0.6" stroke="#300E0D" stroke-linecap="round" stroke-width="1.8"></path>
+</g>
+<!-- Walnut Half (Center Left) -->
+<g filter="url(#nutShadow)">
+<path d="M125 150 C110 130, 112 98, 140 102 C160 104, 168 126, 162 148 C158 165, 138 168, 125 150Z" fill="url(#walnutGrad)"></path>
+<path d="M136 112 C132 125, 148 130, 145 145" stroke="#4A250B" stroke-linecap="round" stroke-width="3"></path>
+<path d="M142 110 C155 120, 135 138, 150 148" stroke="#4A250B" stroke-linecap="round" stroke-width="2.5"></path>
+<path d="M128 125 C136 127, 140 120, 145 122" opacity="0.4" stroke="#FFD8B3" stroke-linecap="round" stroke-width="1.5"></path>
+</g>
+<!-- Roasted Cashew Kernel (Right Front) -->
+<g filter="url(#nutShadow)">
+<path d="M210 220 C236 210, 252 178, 235 158 C220 142, 196 150, 198 168 C200 182, 215 180, 218 194 C222 208, 196 226, 178 214 C170 208, 165 218, 174 225 C186 234, 198 226, 210 220Z" fill="url(#cashewGrad)"></path>
+<path d="M215 165 C226 172, 225 186, 218 198" opacity="0.4" stroke="#9A7036" stroke-linecap="round" stroke-width="1.8"></path>
+</g>
+<!-- Royal California Almond (Center Top Hero) -->
+<g filter="url(#nutShadow)">
+<path d="M172 82 C196 114, 218 152, 194 184 C175 208, 144 195, 140 170 C134 135, 152 100, 172 82Z" fill="url(#almondGrad)"></path>
+<!-- Almond Furrows & Highlights -->
+<path d="M168 105 C182 126, 185 154, 174 174" stroke="#5D3010" stroke-linecap="round" stroke-width="2.5"></path>
+<path d="M156 122 C165 138, 166 158, 160 170" stroke="#5D3010" stroke-linecap="round" stroke-width="2"></path>
+<path d="M182 120 C188 132, 188 145, 184 158" stroke="#5D3010" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M164 96 C161 106, 153 124, 150 144" opacity="0.45" stroke="#FDE4CE" stroke-linecap="round" stroke-width="1.8"></path>
+</g>
+<!-- Pistachio in Split Shell (Center Foreground) -->
+<g filter="url(#nutShadow)">
+<!-- Left Half Shell -->
+<path d="M150 200 C138 214, 134 238, 154 250 C162 255, 168 245, 164 235 C158 220, 158 210, 150 200Z" fill="url(#pistaShell)"></path>
+<!-- Vibrant Green Core -->
+<ellipse cx="166" cy="224" fill="url(#pistaKernel)" rx="15" ry="18" transform="rotate(18 166 224)"></ellipse>
+<!-- Purple-ruby skin edge on nut -->
+<path d="M168 208 C176 216, 177 232, 169 240" stroke="#79243E" stroke-linecap="round" stroke-width="3"></path>
+<!-- Right Half Shell -->
+<path d="M184 205 C196 218, 195 238, 178 250 C170 255, 168 245, 172 235 C176 222, 178 212, 184 205Z" fill="url(#pistaShell)"></path>
+</g>
+<!-- Golden Raisin & Cranberry accent gems -->
+<circle cx="218" cy="116" fill="#C43444" filter="url(#nutShadow)" r="8"></circle>
+<path d="M216 113 C218 111, 222 113, 223 115" stroke="#FFA2AC" stroke-linecap="round" stroke-width="1.2"></path>
+<ellipse cx="120" cy="178" fill="#E09F3E" filter="url(#nutShadow)" rx="7" ry="10" transform="rotate(40 120 178)"></ellipse>
+<ellipse cx="215" cy="242" fill="#8F2535" filter="url(#nutShadow)" rx="6" ry="8" transform="rotate(-30 215 242)"></ellipse>
+</svg>
+</div>
+<!-- Carousel Pagination Dots (Matching storyboard 2nd screen style) -->
+<nav aria-label="Onboarding slide indicators" class="flex items-center justify-center gap-2 mt-7">
+<span class="w-8 h-2 rounded-full bg-brand-deepForest transition-all duration-300"></span>
+<span class="w-2 h-2 rounded-full bg-stone-300 transition-all duration-300"></span>
+<span class="w-2 h-2 rounded-full bg-stone-300 transition-all duration-300"></span>
+</nav>
+</section>
+<!-- END: HeroVisualSection -->
+<!-- BEGIN: ActionAndContentSection -->
+<section class="w-full px-7 pb-8 pt-2 flex flex-col items-center text-center" data-purpose="onboarding-copy-and-actions">
+<!-- Headline & Value Proposition -->
+<h1 class="text-[28px] sm:text-[30px] font-extrabold text-brand-deepForest tracking-tight leading-[1.2] mb-3">
+        Welcome to LittleNuts
+      </h1>
+<p class="text-sm font-medium text-brand-muted leading-relaxed max-w-[310px] mb-8">
+        Embark on a culinary journey with handpicked whole harvest, farm-fresh dry fruits &amp; super seeds delivered right to your kitchen.
+      </p>
+<!-- Primary Call to Action Button -->
+<a class="w-full py-4 px-6 bg-[#172B23] hover:bg-[#0F1D17] active:scale-[0.985] text-white font-bold text-base rounded-[20px] transition-all duration-200 shadow-btn-shadow flex items-center justify-center gap-2 group" data-purpose="continue-cta-button" href="#register" role="button">
+<span>Continue</span>
+<svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+</a>
+<!-- Secondary Sign In Link -->
+<div class="mt-4 flex items-center justify-center space-x-1.5 text-xs text-brand-muted">
+<span>Already have an account?</span>
+<a class="font-bold text-brand-deepForest hover:underline decoration-brand-gold underline-offset-4 transition-all" href="#signin">
+          Sign In
+        </a>
+</div>
+<!-- Home Indicator bar (iOS native ergonomics) -->
+<div class="w-32 h-1 bg-stone-300 rounded-full mt-6 mb-1" data-purpose="ios-home-indicator"></div>
+</section>
+<!-- END: ActionAndContentSection -->
+</main>
+<!-- END: MobileDeviceFrame -->
+</body></html>

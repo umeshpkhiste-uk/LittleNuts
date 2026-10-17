@@ -1,0 +1,420 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="customer_profile" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-bright": "#fcf9f4", "surface-tint": "#52625d", "surface-container": "#f0ede9", "on-tertiary": "#ffffff", "on-tertiary-fixed-variant": "#1e5031", "error": "#ba1a1a", "secondary-fixed": "#ffddb8", "on-error": "#ffffff", "surface-dim": "#dcdad5", "on-secondary-fixed-variant": "#653e00", "tertiary-container": "#002e15", "surface-container-highest": "#e5e2dd", "surface-container-lowest": "#ffffff", "inverse-on-surface": "#f3f0eb", "outline-variant": "#c2c8c5", "outline": "#737876", "on-surface-variant": "#424846", "tertiary": "#001708", "on-tertiary-fixed": "#00210e", "primary": "#061512", "on-error-container": "#93000a", "inverse-surface": "#31302d", "tertiary-fixed-dim": "#9dd3aa", "surface-container-low": "#f6f3ee", "background": "#fcf9f4", "on-tertiary-container": "#669974", "surface-variant": "#e5e2dd", "primary-container": "#1b2a26", "surface-container-high": "#ebe8e3", "error-container": "#ffdad6", "primary-fixed-dim": "#b9cac4", "on-secondary-fixed": "#2a1700", "on-primary": "#ffffff", "on-primary-container": "#81928c", "on-surface": "#1c1c19", "on-primary-fixed": "#0f1e1b", "surface": "#fcf9f4", "on-secondary": "#ffffff", "secondary-container": "#ffb149", "secondary-fixed-dim": "#ffb95f", "on-secondary-container": "#704500", "primary-fixed": "#d5e6e0", "on-background": "#1c1c19", "secondary": "#855300", "on-primary-fixed-variant": "#3a4a45", "tertiary-fixed": "#b9efc5", "inverse-primary": "#b9cac4" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-sm": "0.5rem", "space-lg": "1.25rem", "margin": "1.25rem", "space-md": "0.875rem", "gutter": "1rem", "space-xl": "2rem", "space-xs": "0.25rem" }, "fontFamily": { "body-md": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "display-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"] }, "fontSize": { "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-lg": ["15px", { "lineHeight": "22px", "fontWeight": "400" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "headline-sm": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg-mobile": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col selection:bg-secondary-fixed selection:text-on-secondary-fixed"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(27,42,38,0.04)]"><div class="h-24 flex flex-col justify-between px-margin pt-safe"><div class="flex items-center justify-between h-6 w-full text-on-surface"><span class="font-label-md text-label-md tracking-tight font-semibold">9:41</span><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span><span class="material-symbols-outlined text-[16px]">wifi</span><span class="material-symbols-outlined text-[18px]">battery_full</span></div></div><div class="flex items-center justify-between pb-space-sm"><div class="flex flex-col gap-0.5"><div class="inline-flex items-center gap-1.5 w-fit px-2 py-0.5 rounded-full bg-primary text-primary-fixed font-mono text-[10px] tracking-wider uppercase font-bold shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span><span class="">07 | Customer Profile</span></div><h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">My Profile</h1></div><div class="flex items-center gap-1"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high relative transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary-container ring-2 ring-surface"></span></button><button aria-label="Account settings" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[22px]">settings</span></button></div></div></div></header><main class="flex flex-col relative w-full pt-24 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Interactive Toast Notification -->
+<div class="fixed top-28 left-1/2 -translate-x-1/2 z-50 bg-primary text-on-primary px-space-md py-space-sm rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none translate-y-2" id="toast">
+<span class="material-symbols-outlined text-[18px] text-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md" id="toast-text">Added to basket!</span>
+</div>
+<div class="px-margin flex flex-col gap-space-lg pb-10">
+<!-- Section 1: Customer Profile Header Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-[0_4px_24px_rgba(27,42,38,0.05)] flex flex-col gap-space-md relative overflow-hidden">
+<!-- Decorative Organic Arc Accent -->
+<div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-secondary-fixed/30 pointer-events-none blur-xl"></div>
+<div class="flex items-center gap-space-md relative">
+<!-- Avatar with Badge -->
+<div class="relative shrink-0">
+<div class="w-20 h-20 rounded-full overflow-hidden shadow-sm bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="Close-up warm daylight portrait of a radiant smiling woman in her early thirties, natural soft ambient morning sunlight, linen aesthetic, soft bokeh botanical greens and neutral beige background, subtle cinematic photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9c-PEgVNoMU4kQzrhG3RZj7IMe4v8DGqh17qQMFCZS6u5Sxwn0tsOjmmZSWoZoxg_AUtl5TP2PZC-Glp6aywL9VanKxm4lVw06L3pTJUULhvn9gOAZOyREoQXBcnmOuD76QFm-lZ5gFMzZ-BzMGZHp8CkTY216EljME3qvT5teuiGlsVJoKicIg7pZVH3AxNhrpnH5z2m3Vgnf6nlt2jwCysPNoTOdThyESt64xzNRbr0aGe5KbNDOw">
+</div>
+<button aria-label="Edit Profile Photo" class="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md active:scale-95 transition-transform" onclick="triggerToast('Photo editor opening...')" type="button">
+<span class="material-symbols-outlined text-[15px]">photo_camera</span>
+</button>
+</div>
+<!-- Identity Details -->
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-1.5 flex-wrap">
+<h2 class="font-headline-md text-headline-md text-primary font-bold truncate">Eleanor Vance</h2>
+<span class="material-symbols-outlined text-[18px] text-secondary-container" style="font-variation-settings: 'FILL' 1;" title="Verified Customer">verified</span>
+</div>
+<!-- Tier Tag -->
+<div class="inline-flex items-center gap-1.5 bg-secondary-fixed/50 px-2 py-0.5 rounded-full mt-1 w-fit">
+<span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">spa</span>
+<span class="font-label-sm text-label-sm text-on-secondary-fixed-variant uppercase tracking-wider font-bold">Harvest Gold • 840 Pts</span>
+</div>
+<div class="flex flex-col mt-1.5 gap-0.5">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-outline">mail</span>
+<span class="font-body-sm text-body-sm truncate">eleanor.vance@harvestdaily.com</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-outline">call</span>
+<span class="font-body-sm text-body-sm">+1 (555) 382-9104</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Metrics Row -->
+<div class="grid grid-cols-3 gap-2 pt-space-xs">
+<div class="bg-surface-container-low rounded-lg p-2.5 flex flex-col items-center justify-center text-center">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">18</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-tight mt-0.5">Orders Built</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-2.5 flex flex-col items-center justify-center text-center">
+<span class="font-headline-sm text-headline-sm text-secondary font-bold">3</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-tight mt-0.5">Subscriptions</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-2.5 flex flex-col items-center justify-center text-center">
+<span class="font-headline-sm text-headline-sm text-on-tertiary-fixed-variant font-bold">Rs. 42.80</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-tight mt-0.5">Harvest Saved</span>
+</div>
+</div>
+</div>
+<!-- Section 2: Saved Delivery Addresses -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Delivery Locations</h3>
+</div>
+<button class="font-label-md text-label-md text-secondary font-semibold hover:underline" onclick="triggerToast('Viewing all 4 saved addresses')" type="button">View All (2)</button>
+</div>
+<!-- Address 1 (Default: Home) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-[0_2px_12px_rgba(27,42,38,0.03)] flex items-start gap-space-md relative">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">cottage</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-primary font-bold">Home Sanctuary</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Default</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1 leading-snug">24 Elm Street, Apt 4B</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">West Village, New York, NY 10014</p>
+<div class="flex items-center gap-1.5 mt-2 text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-[14px]">format_image_left</span>
+<span class="font-label-sm text-label-sm">Safe Drop Off • Doorman Desk</span>
+</div>
+</div>
+<button aria-label="Edit address" class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-primary shrink-0 active:scale-95 transition-all" onclick="triggerToast('Editing Home Address')" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<!-- Address 2 (Studio) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-[0_2px_12px_rgba(27,42,38,0.03)] flex items-start gap-space-md relative">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">apartment</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-primary font-bold">Office &amp; Design Studio</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1 leading-snug">742 Evergreen Terrace, Suite 300</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">DUMBO, Brooklyn, NY 11201</p>
+</div>
+<button aria-label="Edit address" class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-primary shrink-0 active:scale-95 transition-all" onclick="triggerToast('Editing Studio Address')" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<!-- Add New Address Button -->
+<button class="w-full py-3 px-4 rounded-xl bg-surface-container flex items-center justify-center gap-2 text-primary font-label-lg text-label-lg font-semibold hover:bg-surface-container-high active:scale-[0.99] transition-all" onclick="triggerToast('Opening Address Sheet...')" type="button">
+<span class="material-symbols-outlined text-[20px]">add_location_alt</span>
+<span class="">Add New Harvest Address</span>
+</button>
+</div>
+<!-- Section 3: Payment Methods & Card Details -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings: 'FILL' 1;">credit_card</span>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Wallet &amp; Payment</h3>
+</div>
+<button class="font-label-md text-label-md text-secondary font-semibold hover:underline" onclick="triggerToast('Manage Payment Gateway')" type="button">Manage</button>
+</div>
+<!-- Primary Card: Organic Dark Botanical Style -->
+<div class="bg-primary-container text-on-primary rounded-xl p-space-md shadow-[0_6px_20px_rgba(6,21,18,0.12)] flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute right-0 bottom-0 translate-x-4 translate-y-4 w-36 h-36 rounded-full bg-secondary/20 pointer-events-none blur-2xl"></div>
+<div class="flex items-center justify-between relative">
+<div class="flex items-center gap-2">
+<div class="w-8 h-6 bg-secondary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-primary font-bold">memory</span>
+</div>
+<span class="font-label-sm text-label-sm tracking-widest uppercase text-on-primary-container">Harvest Pay</span>
+</div>
+<span class="bg-secondary text-on-secondary font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Default Card</span>
+</div>
+<div class="flex items-center justify-between relative mt-1">
+<span class="font-headline-sm text-headline-sm tracking-widest font-mono text-on-primary">•••• •••• •••• 4234</span>
+<span class="font-label-lg text-label-lg font-extrabold italic text-secondary-fixed">Mastercard</span>
+</div>
+<div class="flex items-center justify-between relative text-on-primary-container pt-1">
+<div>
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container/80">Cardholder</p>
+<p class="font-label-md text-label-md font-semibold text-on-primary">ELEANOR VANCE</p>
+</div>
+<div class="text-right">
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container/80">Expires</p>
+<p class="font-label-md text-label-md font-semibold text-on-primary">08 / 27</p>
+</div>
+</div>
+</div>
+<!-- Secondary Card: Visa Almond -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-[0_2px_12px_rgba(27,42,38,0.03)] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-7 rounded bg-surface-container-high flex items-center justify-center font-extrabold italic text-primary text-xs">
+            VISA
+          </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-primary font-bold">Visa Signature •••• 8812</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Expires 11 / 26 • Personal</span>
+</div>
+</div>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary" onclick="triggerToast('Set Visa as Default Card')" type="button">Make Default</button>
+</div>
+<!-- Apple Pay Quick Banner -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-[0_2px_12px_rgba(27,42,38,0.03)] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">contactless</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-primary font-bold">Apple Pay Express</span>
+<span class="font-body-sm text-body-sm text-on-tertiary-fixed-variant flex items-center gap-1 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-fixed-variant"></span>
+              Active &amp; Verified
+            </span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[22px] text-on-tertiary-fixed-variant">check_circle</span>
+</div>
+<!-- Add New Payment Card Button -->
+<button class="w-full py-3 px-4 rounded-xl bg-surface-container-low flex items-center justify-center gap-2 text-primary font-label-lg text-label-lg font-semibold hover:bg-surface-container active:scale-[0.99] transition-all" onclick="triggerToast('Card Scanner Opening...')" type="button">
+<span class="material-symbols-outlined text-[20px]">add_card</span>
+<span class="">Add New Payment Method</span>
+</button>
+</div>
+<!-- Section 4: Favorite Dry Fruits & Quick Reorder Carousel -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-secondary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Favorite Dry Fruits &amp; Seeds</h3>
+</div>
+<button class="font-label-md text-label-md text-secondary font-semibold hover:underline" onclick="triggerToast('Managing favorites list')" type="button">Manage (6)</button>
+</div>
+<!-- Horizontal Scrollable Cards -->
+<div class="flex gap-3 overflow-x-auto pb-2 -mx-margin px-margin snap-x snap-mandatory">
+<!-- Product 1: Almonds -->
+<div class="w-44 shrink-0 bg-surface-container-lowest rounded-xl p-3 shadow-[0_2px_14px_rgba(27,42,38,0.04)] flex flex-col justify-between snap-start">
+<div class="flex flex-col">
+<div class="relative w-full h-32 rounded-lg overflow-hidden bg-surface-container-low flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Premium organic whole Mamra almonds arranged in a minimalist ceramic dish, warm morning sunlight, natural almond parchment aesthetic, studio boutique grocery photography, shallow depth of field" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXrTy6PSNawBpv6M_x4NqWPObQEAiNoTi51fhVy1n9-icjtN1sGpGhEJiAlLWqpFv9oawoF0JYZPxtx5DZZ0ityNnRHk1b-vKaMS7h2xgMG0KZEPecCo2wnuqU3mUyWCgxdsq56SZCLVLpGKN6vfBsx49RJGavF7kRszUz3shBbR15dgkFlHCBL9Ghy0RhpY_vIP4VFUQDIbS0n2-Wayem3eHBsYIpsYfGYjZcuGJuqSMWIcSlpfoi3w">
+<span class="absolute top-2 left-2 bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded font-bold">Raw Mamra</span>
+<button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-error shadow-sm" onclick="triggerToast('Item saved in favorites')" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<h4 class="font-label-lg text-label-lg text-primary font-bold mt-2.5 line-clamp-1">California Almonds</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">250g Jar Satchel</span>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">Rs. 14.50</span>
+<button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-sm" onclick="triggerToast('California Almonds added to basket!')" title="Quick Add" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Product 2: Pistachios -->
+<div class="w-44 shrink-0 bg-surface-container-lowest rounded-xl p-3 shadow-[0_2px_14px_rgba(27,42,38,0.04)] flex flex-col justify-between snap-start">
+<div class="flex flex-col">
+<div class="relative w-full h-32 rounded-lg overflow-hidden bg-surface-container-low flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Artisanal lightly roasted Persian green pistachios with delicate sea salt dusting, warm organic earth tones, soft luxury gourmet packaging styling, natural daylight product photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnmFXHSfQg46_3KoP5HfxbQOvGj6wR0dagsjTvgC_BlQKNXffBgFt-HqqCD-ck5joYSBmc8y5ZUlU1U2y3y_dGgN5_p6xU6tDhOUApubKZCxrLjxyGAPUsJy3Yiy1GDEu4V9TS_bv6DsynoENU1Bnm38JohESEv9F3_kb8FZZxLv2Agdn5uEcCWiOjzQ1cu5_ZZ-2tUep-wzvWFySsZ8Rfvt9XiuOQWnSRefIY-a5S6PFtxt_GVcdgEw">
+<span class="absolute top-2 left-2 bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded font-bold">Salted</span>
+<button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-error shadow-sm" onclick="triggerToast('Item saved in favorites')" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<h4 class="font-label-lg text-label-lg text-primary font-bold mt-2.5 line-clamp-1">Iranian Pistachios</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">200g Roasted Pack</span>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">$16.90</span>
+<button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-sm" onclick="triggerToast('Iranian Pistachios added to basket!')" title="Quick Add" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Product 3: Dates -->
+<div class="w-44 shrink-0 bg-surface-container-lowest rounded-xl p-3 shadow-[0_2px_14px_rgba(27,42,38,0.04)] flex flex-col justify-between snap-start">
+<div class="flex flex-col">
+<div class="relative w-full h-32 rounded-lg overflow-hidden bg-surface-container-low flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Succulent plump Medjool king dates arranged on a raw linen cloth, glossy organic caramel sheen, boutique pantry whole food styling, warm morning lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0G9Eyq2GC9qp5GePhTiUSIQLNB2rYr9JkP1eYsuIOPRqtyiBh2qgLryfM9TG7O6s1b4Kcquq2TVb1QpyPQh5bdsXlnD0e5mbinsOMsnxyoE03aZwB-ut_DusIKnIEtoWa0XrcuhMvZ-MSUUbw740xTaOTvreij2yQBaK6hRe9hOFNiRYpKMPjXHzyBQtK1rv53LggMijfPb1RJAkY84AEEpyBRC-My_xhGlW_wfN4NAkMyTZ5HZBOLQ">
+<span class="absolute top-2 left-2 bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded font-bold">King Size</span>
+<button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-error shadow-sm" onclick="triggerToast('Item saved in favorites')" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<h4 class="font-label-lg text-label-lg text-primary font-bold mt-2.5 line-clamp-1">Medjool King Dates</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">500g Fresh Box</span>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">$11.50</span>
+<button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-sm" onclick="triggerToast('Medjool King Dates added to basket!')" title="Quick Add" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Product 4: Seed Blend -->
+<div class="w-44 shrink-0 bg-surface-container-lowest rounded-xl p-3 shadow-[0_2px_14px_rgba(27,42,38,0.04)] flex flex-col justify-between snap-start">
+<div class="flex flex-col">
+<div class="relative w-full h-32 rounded-lg overflow-hidden bg-surface-container-low flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Vibrant organic raw pumpkin seeds and black chia seeds mixed in a tactile handmade stone bowl, earthy botanical vibe, natural soft window reflection, culinary studio look" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeAn3F0BpGMYiWjuGT1wlELfH10TlxHJVKw11EmQJ9zIrXlecWe6bDEuC11BEGuVsajkCo0r2-G1-iMnhwSxjxCB-JTpbGPEi67fII0OCFiNxsqNqIk-gEXXDrY_Z1KSEjgLV-rm8ofD41slt4JH1gURg2XYHPcEXsHnhtyhq42kU-DJfYHfpIxtCadcbKMB-25DJCmHZKTF6LBeVW4mwe-OrSk_MzpAELPUqMRhBfKkwTOM1kWALdiw">
+<span class="absolute top-2 left-2 bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded font-bold">Keto Mix</span>
+<button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-error shadow-sm" onclick="triggerToast('Item saved in favorites')" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<h4 class="font-label-lg text-label-lg text-primary font-bold mt-2.5 line-clamp-1">Pumpkin &amp; Chia Blend</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">300g Daily Dose</span>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">$9.20</span>
+<button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-sm" onclick="triggerToast('Pumpkin Chia Blend added to basket!')" title="Quick Add" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 5: Preferences & App Settings -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings: 'FILL' 1;">tune</span>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Preferences &amp; Habit Sync</h3>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-[0_2px_12px_rgba(27,42,38,0.03)] flex flex-col gap-space-md">
+<!-- Daily Handful Reminder -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">alarm</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-primary font-bold">Daily Handful Routine</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Morning prompt: 8:00 AM</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="triggerToast(this.checked ? 'Daily Routine active' : 'Daily Routine paused')" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Push Notifications -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">notifications_active</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-primary font-bold">Courier &amp; Roast Alerts</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Real-time batch dispatch tracking</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="triggerToast(this.checked ? 'Alerts active' : 'Alerts silenced')" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Dietary Focus Tag Badge Selection -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-[20px]">nutrition</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-primary font-bold">Dietary Focus</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Personalized curation filter</span>
+</div>
+</div>
+<div class="bg-surface-container-high text-primary font-label-md text-label-md px-3 py-1 rounded-full font-bold flex items-center gap-1 cursor-pointer" onclick="triggerToast('Diet goals: Heart Health &amp; Keto')">
+<span class="">Heart Health • Keto</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</div>
+</div>
+<!-- App Color Theme Selector -->
+<div class="flex flex-col gap-2 pt-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Visual Atmosphere</span>
+<div class="grid grid-cols-3 gap-2 p-1 bg-surface-container rounded-xl">
+<button class="py-2 px-2 rounded-lg bg-surface-container-lowest text-primary font-label-sm text-label-sm font-bold shadow-sm text-center flex items-center justify-center gap-1" onclick="selectTheme(this, 'Cream')" type="button">
+<span class="material-symbols-outlined text-[14px] text-secondary">light_mode</span>
+<span class="">Cream</span>
+</button>
+<button class="py-2 px-2 rounded-lg text-on-surface-variant font-label-sm text-label-sm font-semibold text-center hover:text-primary flex items-center justify-center gap-1" onclick="selectTheme(this, 'Forest Night')" type="button">
+<span class="material-symbols-outlined text-[14px]">dark_mode</span>
+<span class="">Forest</span>
+</button>
+<button class="py-2 px-2 rounded-lg text-on-surface-variant font-label-sm text-label-sm font-semibold text-center hover:text-primary flex items-center justify-center gap-1" onclick="selectTheme(this, 'System Auto')" type="button">
+<span class="material-symbols-outlined text-[14px]">brightness_auto</span>
+<span class="">Auto</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 6: Support, Documents & Logout -->
+<div class="flex flex-col gap-2">
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_2px_12px_rgba(27,42,38,0.03)]">
+<a class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors" href="#" onclick="triggerToast('Opening Support Desk')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">help_outline</span>
+<span class="font-body-md text-body-md text-primary font-medium">Customer Concierge &amp; FAQ</span>
+</div>
+<span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+</a>
+<a class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors" href="#" onclick="triggerToast('Opening LittleNuts Standards')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">verified_user</span>
+<span class="font-body-md text-body-md text-primary font-medium">Organic Harvest Guarantee &amp; Privacy</span>
+</div>
+<span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+</a>
+</div>
+<!-- Log Out Button -->
+<button class="w-full py-3.5 mt-2 rounded-xl bg-surface-container-high text-error font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 hover:bg-error-container hover:text-on-error-container active:scale-[0.99] transition-all" onclick="confirmLogout()" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="">Sign Out of LittleNuts</span>
+</button>
+<!-- App version & footer watermark -->
+<div class="text-center pt-2 pb-4">
+<p class="font-label-sm text-label-sm text-outline">LittleNuts Artisanal Foods • v2.14.0</p>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function triggerToast(message) {
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    if (!toast || !toastText) return;
+    
+    toastText.textContent = message;
+    toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+    toast.classList.add('opacity-100', 'translate-y-0');
+
+    clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => {
+      toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+      toast.classList.remove('opacity-100', 'translate-y-0');
+    }, 2200);
+  }
+
+  function selectTheme(btn, themeName) {
+    const buttons = btn.parentElement.querySelectorAll('button');
+    buttons.forEach(b => {
+      b.className = "py-2 px-2 rounded-lg text-on-surface-variant font-label-sm text-label-sm font-semibold text-center hover:text-primary flex items-center justify-center gap-1";
+    });
+    btn.className = "py-2 px-2 rounded-lg bg-surface-container-lowest text-primary font-label-sm text-label-sm font-bold shadow-sm text-center flex items-center justify-center gap-1";
+    triggerToast(themeName + ' Theme activated');
+  }
+
+  function confirmLogout() {
+    triggerToast('Securely logging out Eleanor...');
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(27,42,38,0.05)]" data-active-classes="text-primary font-semibold"><div class="flex items-center justify-around h-16 px-space-xs"><a class="flex flex-col items-center justify-center w-16 h-14 text-on-surface-variant hover:text-on-surface transition-colors" data-path="home" href="#"><span class="material-symbols-outlined text-[24px]">storefront</span><span class="font-label-sm text-label-sm mt-0.5">Home</span></a><a class="flex flex-col items-center justify-center w-16 h-14 text-on-surface-variant hover:text-on-surface transition-colors" data-path="explore" href="#"><span class="material-symbols-outlined text-[24px]">grid_view</span><span class="font-label-sm text-label-sm mt-0.5">Explore</span></a><a class="flex flex-col items-center justify-center w-16 h-14 text-on-surface-variant hover:text-on-surface relative transition-colors" data-path="my-cart" href="#"><span class="material-symbols-outlined text-[24px]">shopping_bag</span><span class="absolute top-1.5 right-3.5 bg-secondary text-on-secondary font-label-sm text-[10px] min-w-[16px] h-4 rounded-full px-1 flex items-center justify-center leading-none">3</span><span class="font-label-sm text-label-sm mt-0.5">My Cart</span></a><a class="flex flex-col items-center justify-center w-16 h-14 text-primary font-semibold transition-colors relative" data-path="profile" href="#"><span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span><span class="font-label-sm text-label-sm mt-0.5 text-primary">Profile</span><span class="w-1 h-1 rounded-full bg-primary absolute bottom-1"></span></a></div></nav>
+
+</body></html>
