@@ -59,9 +59,9 @@ export function OnboardingScreen() {
           <View style={[styles.dot, { backgroundColor: theme.border }]} />
         </View>
 
-        <Text style={[styles.title, { color: theme.textPrimary }]}>Welcome to Little Nuts</Text>
+        <Text style={[styles.title, { color: theme.textPrimary }]}>Welcome to LittleNuts</Text>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          A premium range of handpicked nuts, seeds & dried fruits — 100% natural, healthy, and
+          A premium range of handpicked nuts, seeds & dry fruits — 100% natural, healthy, and
           delivered fresh to your door.
         </Text>
 
