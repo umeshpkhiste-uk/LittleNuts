@@ -17,6 +17,7 @@ export default function AuthLayout() {
       }}
     >
       <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="register" options={{ headerShown: false }} />
       <Stack.Screen name="admin-login" options={{ title: 'Store Admin' }} />
     </Stack>
   );

@@ -1,45 +1,24 @@
 import { useEffect, useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  type TextInputProps,
-} from 'react-native';
-import { router } from 'expo-router';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Link, router } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { LightInput } from '@/components/light-form-input';
 import { goBack } from '@/lib/go-back';
 import { clearSavedCredentials, getSavedCredentials, setSavedCredentials } from '@/lib/saved-credentials';
 import { showAlert } from '@/lib/show-alert';
 import { supabase } from '@/lib/supabase/client';
 import { loginSchema, type LoginInput } from '@/lib/validation/auth';
+import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
 import { radius, spacing, typography } from '@/theme/tokens';
 
-// Same light, cream-and-forest-green look as the welcome screen (see
-// onboarding-screen.tsx) — matches the brand mockup at
-// design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
-// littlenuts_sign_in_screen/screen.png. A deliberate departure from the
-// app's usual dark glass theme, same as onboarding.
-const COLORS = {
-  background: '#F8F3EA',
-  card: '#FFFFFF',
-  border: '#E8E1D2',
-  badgeBg: '#EDE6D6',
-  badgeText: '#2B2B22',
-  heading: '#1C2A1E',
-  subtitle: '#8B8A80',
-  button: '#17241B',
-  forgot: '#C1502E',
-} as const;
-
+// Light, cream-and-forest-green look shared with the welcome and register
+// screens (see src/theme/auth-light-palette.ts) — matches the brand
+// mockup at design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
+// littlenuts_sign_in_screen/screen.png.
 export function LoginScreen() {
   const insets = useSafeAreaInsets();
   const [formError, setFormError] = useState<string | null>(null);
@@ -181,49 +160,19 @@ export function LoginScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        <Pressable
-          onPress={onGoogleContinue}
-          style={[styles.socialButton, { marginBottom: Math.max(insets.bottom, spacing.lg) }]}
-        >
+        <Pressable onPress={onGoogleContinue} style={styles.socialButton}>
           <Ionicons name="logo-google" size={18} color={COLORS.heading} />
           <Text style={styles.socialLabel}>Continue with Google</Text>
         </Pressable>
+
+        <Text style={[styles.footer, { marginBottom: Math.max(insets.bottom, spacing.lg) }]}>
+          Don&apos;t have an account?{' '}
+          <Link href="/auth/register" asChild>
+            <Text style={styles.footerLink}>Sign Up.</Text>
+          </Link>
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
-  );
-}
-
-type LightInputProps = TextInputProps & {
-  icon: keyof typeof Ionicons.glyphMap;
-  error?: string;
-};
-
-function LightInput({ icon, error, secureTextEntry, style, ...inputProps }: LightInputProps) {
-  const [visible, setVisible] = useState(false);
-  const isPassword = !!secureTextEntry;
-
-  return (
-    <View style={styles.inputGroup}>
-      <View style={[styles.inputWrap, error ? styles.inputWrapError : null]}>
-        <Ionicons name={icon} size={18} color={COLORS.subtitle} style={styles.inputIcon} />
-        <TextInput
-          placeholderTextColor={COLORS.subtitle}
-          secureTextEntry={isPassword && !visible}
-          style={[styles.input, style]}
-          {...inputProps}
-        />
-        {isPassword ? (
-          <Pressable onPress={() => setVisible((v) => !v)} hitSlop={8} style={styles.inputRightIcon}>
-            <Ionicons
-              name={visible ? 'eye-off-outline' : 'eye-outline'}
-              size={18}
-              color={COLORS.subtitle}
-            />
-          </Pressable>
-        ) : null}
-      </View>
-      {error ? <Text style={styles.inputError}>{error}</Text> : null}
-    </View>
   );
 }
 
@@ -275,37 +224,6 @@ const styles = StyleSheet.create({
   },
   errorBanner: {
     ...typography.body,
-    color: COLORS.forgot,
-  },
-  inputGroup: {
-    gap: spacing.xs,
-  },
-  inputWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: radius.pill,
-    backgroundColor: COLORS.card,
-  },
-  inputWrapError: {
-    borderColor: COLORS.forgot,
-  },
-  inputIcon: {
-    marginLeft: spacing.md,
-  },
-  input: {
-    flex: 1,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm + 2,
-    fontSize: 15,
-    color: COLORS.heading,
-  },
-  inputRightIcon: {
-    paddingHorizontal: spacing.md,
-  },
-  inputError: {
-    ...typography.caption,
     color: COLORS.forgot,
   },
   optionsRow: {
@@ -381,5 +299,15 @@ const styles = StyleSheet.create({
   socialLabel: {
     ...typography.bodyStrong,
     color: COLORS.heading,
+  },
+  footer: {
+    ...typography.body,
+    textAlign: 'center',
+    color: COLORS.subtitle,
+  },
+  footerLink: {
+    fontWeight: '700',
+    color: COLORS.heading,
+    textDecorationLine: 'underline',
   },
 });
