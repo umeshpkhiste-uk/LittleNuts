@@ -6,7 +6,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
+  type TextInputProps,
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
@@ -14,19 +16,32 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { FormTextInput } from '@/components/form-text-input';
-import { PrimaryButton } from '@/components/primary-button';
 import { setHasAccount } from '@/lib/account-history';
 import { goBack } from '@/lib/go-back';
 import { clearSavedCredentials, getSavedCredentials, setSavedCredentials } from '@/lib/saved-credentials';
 import { showAlert } from '@/lib/show-alert';
 import { supabase } from '@/lib/supabase/client';
 import { loginSchema, type LoginInput } from '@/lib/validation/auth';
-import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
+// Same light, cream-and-forest-green look as the welcome screen (see
+// onboarding-screen.tsx) — matches the brand mockup at
+// design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
+// littlenuts_sign_in_screen/screen.png. A deliberate departure from the
+// app's usual dark glass theme, same as onboarding.
+const COLORS = {
+  background: '#F8F3EA',
+  card: '#FFFFFF',
+  border: '#E8E1D2',
+  badgeBg: '#EDE6D6',
+  badgeText: '#2B2B22',
+  heading: '#1C2A1E',
+  subtitle: '#8B8A80',
+  button: '#17241B',
+  forgot: '#C1502E',
+} as const;
+
 export function LoginScreen() {
-  const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,38 +106,37 @@ export function LoginScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.container,
-          { backgroundColor: theme.background, paddingTop: insets.top + spacing.md },
+          { backgroundColor: COLORS.background, paddingTop: insets.top + spacing.md },
         ]}
         keyboardShouldPersistTaps="handled"
       >
-        <Pressable
-          onPress={() => goBack()}
-          hitSlop={8}
-          style={[styles.backButton, { borderColor: theme.border, backgroundColor: theme.card }]}
-        >
-          <Ionicons name="chevron-back" size={20} color={theme.textPrimary} />
-        </Pressable>
+        <View style={styles.topRow}>
+          <Pressable onPress={() => goBack()} hitSlop={8} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={20} color={COLORS.heading} />
+          </Pressable>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>AUTH • SIGN IN</Text>
+          </View>
+        </View>
 
         <View style={styles.heading}>
-          <Text style={[styles.title, { color: theme.textPrimary }]}>Welcome back</Text>
-          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-            Access your account for seamless shopping for fresh and delicious groceries
+          <Text style={styles.title}>Welcome back</Text>
+          <Text style={styles.subtitle}>
+            Access your account for seamless shopping for fresh, roasted and raw artisanal dry
+            fruits.
           </Text>
         </View>
 
-        {formError ? (
-          <Text style={[styles.errorBanner, { color: theme.danger }]}>{formError}</Text>
-        ) : null}
+        {formError ? <Text style={styles.errorBanner}>{formError}</Text> : null}
 
         <View style={styles.form}>
           <Controller
             control={form.control}
             name="email"
             render={({ field, fieldState }) => (
-              <FormTextInput
+              <LightInput
                 placeholder="Email Address"
                 icon="mail-outline"
-                shape="pill"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 value={field.value}
@@ -135,10 +149,9 @@ export function LoginScreen() {
             control={form.control}
             name="password"
             render={({ field, fieldState }) => (
-              <FormTextInput
+              <LightInput
                 placeholder="Password"
                 icon="lock-closed-outline"
-                shape="pill"
                 secureTextEntry
                 value={field.value}
                 onChangeText={field.onChange}
@@ -148,54 +161,75 @@ export function LoginScreen() {
           />
 
           <View style={styles.optionsRow}>
-            <Pressable
-              onPress={() => setSavePassword((v) => !v)}
-              hitSlop={8}
-              style={styles.saveRow}
-            >
-              <Ionicons
-                name={savePassword ? 'checkbox' : 'square-outline'}
-                size={18}
-                color={savePassword ? theme.primary : theme.textSecondary}
-              />
-              <Text style={[styles.saveLabel, { color: theme.textSecondary }]}>Save password</Text>
+            <Pressable onPress={() => setSavePassword((v) => !v)} hitSlop={8} style={styles.saveRow}>
+              <View style={[styles.checkbox, savePassword && styles.checkboxChecked]}>
+                {savePassword ? <Ionicons name="checkmark" size={14} color={COLORS.card} /> : null}
+              </View>
+              <Text style={styles.saveLabel}>Save password</Text>
             </Pressable>
             <Pressable onPress={onForgotPassword} hitSlop={8}>
-              <Text style={[styles.forgotLabel, { color: theme.danger }]}>Forgot password?</Text>
+              <Text style={styles.forgotLabel}>Forgot password?</Text>
             </Pressable>
           </View>
 
-          <PrimaryButton
-            title="Sign In"
-            loading={isSubmitting}
-            onPress={form.handleSubmit(onSubmit)}
-          />
+          <Pressable onPress={form.handleSubmit(onSubmit)} disabled={isSubmitting} style={styles.cta}>
+            <Text style={styles.ctaLabel}>{isSubmitting ? 'Signing In…' : 'Sign In'}</Text>
+          </Pressable>
         </View>
 
         <View style={styles.dividerRow}>
-          <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-          <Text style={[styles.dividerText, { color: theme.textSecondary }]}>Or continue with</Text>
-          <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>OR CONTINUE WITH</Text>
+          <View style={styles.dividerLine} />
         </View>
 
-        <Pressable
-          onPress={onGoogleContinue}
-          style={[styles.socialButton, { borderColor: theme.border, backgroundColor: theme.card }]}
-        >
-          <Ionicons name="logo-google" size={18} color={theme.textPrimary} />
-          <Text style={[styles.socialLabel, { color: theme.textPrimary }]}>
-            Continue with Google
-          </Text>
+        <Pressable onPress={onGoogleContinue} style={styles.socialButton}>
+          <Ionicons name="logo-google" size={18} color={COLORS.heading} />
+          <Text style={styles.socialLabel}>Continue with Google</Text>
         </Pressable>
 
-        <Text style={[styles.footer, { color: theme.textSecondary }]}>
+        <Text style={[styles.footer, { marginBottom: Math.max(insets.bottom, spacing.lg) }]}>
           Don&apos;t have an account?{' '}
           <Link href="/auth/register" asChild>
-            <Text style={{ color: theme.primary, fontWeight: '700' }}>Sign Up</Text>
+            <Text style={styles.footerLink}>Sign Up.</Text>
           </Link>
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>
+  );
+}
+
+type LightInputProps = TextInputProps & {
+  icon: keyof typeof Ionicons.glyphMap;
+  error?: string;
+};
+
+function LightInput({ icon, error, secureTextEntry, style, ...inputProps }: LightInputProps) {
+  const [visible, setVisible] = useState(false);
+  const isPassword = !!secureTextEntry;
+
+  return (
+    <View style={styles.inputGroup}>
+      <View style={[styles.inputWrap, error ? styles.inputWrapError : null]}>
+        <Ionicons name={icon} size={18} color={COLORS.subtitle} style={styles.inputIcon} />
+        <TextInput
+          placeholderTextColor={COLORS.subtitle}
+          secureTextEntry={isPassword && !visible}
+          style={[styles.input, style]}
+          {...inputProps}
+        />
+        {isPassword ? (
+          <Pressable onPress={() => setVisible((v) => !v)} hitSlop={8} style={styles.inputRightIcon}>
+            <Ionicons
+              name={visible ? 'eye-off-outline' : 'eye-outline'}
+              size={18}
+              color={COLORS.subtitle}
+            />
+          </Pressable>
+        ) : null}
+      </View>
+      {error ? <Text style={styles.inputError}>{error}</Text> : null}
+    </View>
   );
 }
 
@@ -206,28 +240,79 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
     gap: spacing.lg,
   },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: radius.pill,
-    borderWidth: 1,
+    backgroundColor: COLORS.card,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  badge: {
+    backgroundColor: COLORS.badgeBg,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  badgeText: {
+    ...typography.caption,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    color: COLORS.badgeText,
   },
   heading: {
     gap: spacing.sm,
   },
   title: {
     ...typography.display,
+    color: COLORS.heading,
   },
   subtitle: {
     ...typography.body,
+    color: COLORS.subtitle,
   },
   form: {
     gap: spacing.md,
   },
   errorBanner: {
     ...typography.body,
+    color: COLORS.forgot,
+  },
+  inputGroup: {
+    gap: spacing.xs,
+  },
+  inputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: radius.pill,
+    backgroundColor: COLORS.card,
+  },
+  inputWrapError: {
+    borderColor: COLORS.forgot,
+  },
+  inputIcon: {
+    marginLeft: spacing.md,
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm + 2,
+    fontSize: 15,
+    color: COLORS.heading,
+  },
+  inputRightIcon: {
+    paddingHorizontal: spacing.md,
+  },
+  inputError: {
+    ...typography.caption,
+    color: COLORS.forgot,
   },
   optionsRow: {
     flexDirection: 'row',
@@ -239,12 +324,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: COLORS.button,
+    borderColor: COLORS.button,
+  },
   saveLabel: {
     ...typography.caption,
+    color: COLORS.heading,
   },
   forgotLabel: {
     ...typography.caption,
     fontWeight: '700',
+    color: COLORS.forgot,
+  },
+  cta: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.button,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.md,
+  },
+  ctaLabel: {
+    ...typography.bodyStrong,
+    color: COLORS.card,
   },
   dividerRow: {
     flexDirection: 'row',
@@ -254,9 +365,13 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: StyleSheet.hairlineWidth,
+    backgroundColor: COLORS.border,
   },
   dividerText: {
     ...typography.caption,
+    fontWeight: '600',
+    letterSpacing: 0.4,
+    color: COLORS.subtitle,
   },
   socialButton: {
     flexDirection: 'row',
@@ -264,14 +379,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.card,
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
   },
   socialLabel: {
     ...typography.bodyStrong,
+    color: COLORS.heading,
   },
   footer: {
     ...typography.body,
     textAlign: 'center',
+    color: COLORS.subtitle,
+  },
+  footerLink: {
+    fontWeight: '700',
+    color: COLORS.heading,
+    textDecorationLine: 'underline',
   },
 });
