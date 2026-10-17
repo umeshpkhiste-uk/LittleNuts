@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/primary-button';
 import { setOnboardingComplete } from '@/lib/onboarding';
+import { supabase } from '@/lib/supabase/client';
 import { useAppTheme } from '@/theme/theme-provider';
 import { glassShadow, radius, spacing, typography } from '@/theme/tokens';
 
@@ -21,10 +22,10 @@ export function OnboardingScreen() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
 
-  function handleGetStarted() {
-    setOnboardingComplete().finally(() => {
-      router.replace('/(customer)/(tabs)');
-    });
+  async function handleGetStarted() {
+    await setOnboardingComplete();
+    const { data } = await supabase.auth.getSession();
+    router.replace(data.session ? '/(customer)/(tabs)' : '/auth/register');
   }
 
   return (
