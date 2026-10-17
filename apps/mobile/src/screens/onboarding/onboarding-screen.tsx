@@ -39,7 +39,7 @@ export function OnboardingScreen() {
   async function handleContinue() {
     await setOnboardingComplete();
     const { data } = await supabase.auth.getSession();
-    router.replace(data.session ? '/(customer)/(tabs)' : '/auth/register');
+    router.replace(data.session ? '/(customer)/(tabs)' : '/auth/login');
   }
 
   return (

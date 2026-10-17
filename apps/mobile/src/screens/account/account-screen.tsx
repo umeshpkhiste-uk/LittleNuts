@@ -44,11 +44,6 @@ export function AccountScreen() {
               Log in to manage your addresses, place orders, and track deliveries.
             </Text>
             <PrimaryButton title="Log In" onPress={() => router.push('/auth/login')} />
-            <PrimaryButton
-              title="Create Account"
-              variant="secondary"
-              onPress={() => router.push('/auth/register')}
-            />
           </>
         )}
       </View>

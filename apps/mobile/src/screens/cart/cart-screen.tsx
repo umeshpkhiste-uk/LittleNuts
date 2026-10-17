@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +6,6 @@ import { formatWeight, itemSubtotalPaise, paiseToRupeesLabel, sumPaise } from '@
 
 import { PrimaryButton } from '@/components/primary-button';
 import { useCart, useRemoveCartItem, useSetCartItemQuantity } from '@/hooks/cart/use-cart';
-import { getHasAccount } from '@/lib/account-history';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
@@ -18,34 +16,15 @@ export function CartScreen() {
   const cart = useCart();
   const setQuantity = useSetCartItemQuantity();
   const removeItem = useRemoveCartItem();
-  const [hasAccount, setHasAccount] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (session) return;
-    getHasAccount().then(setHasAccount);
-  }, [session]);
 
   if (!session) {
-    if (hasAccount === null) {
-      return (
-        <View style={[styles.empty, { backgroundColor: theme.background }]}>
-          <ActivityIndicator color={theme.primary} />
-        </View>
-      );
-    }
-
     return (
       <View style={[styles.empty, { backgroundColor: theme.background }]}>
         <Text style={[styles.emptyTitle, { color: theme.textPrimary }]}>Your cart is empty</Text>
         <Text style={[styles.emptyBody, { color: theme.textSecondary }]}>
-          {hasAccount
-            ? 'Log in to add items and build your cart.'
-            : 'Create an account to add items and build your cart.'}
+          Log in to add items and build your cart.
         </Text>
-        <PrimaryButton
-          title={hasAccount ? 'Log In' : 'Sign Up'}
-          onPress={() => router.push(hasAccount ? '/auth/login' : '/auth/register')}
-        />
+        <PrimaryButton title="Log In" onPress={() => router.push('/auth/login')} />
       </View>
     );
   }

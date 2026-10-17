@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { randomUUID } from 'expo-crypto';
 import { router } from 'expo-router';
@@ -15,7 +15,6 @@ import { useAddresses } from '@/hooks/addresses/use-addresses';
 import { useCart } from '@/hooks/cart/use-cart';
 import { useCreateOrder } from '@/hooks/checkout/use-create-order';
 import { useStoreSettings } from '@/hooks/checkout/use-store-settings';
-import { getHasAccount } from '@/lib/account-history';
 import { createRazorpayOrder, verifyRazorpayPayment } from '@/lib/payments/razorpay-api';
 import { openRazorpayCheckout } from '@/lib/payments/razorpay-checkout';
 import { useAuthStore } from '@/stores/auth-store';
@@ -43,17 +42,6 @@ export function CheckoutScreen() {
   // of the same checkout attempt, regenerated only if the user navigates
   // away and back (a genuinely new attempt).
   const [idempotencyKey] = useState(() => randomUUID());
-
-  // No session: route to sign-up if this device has never had an account,
-  // sign-in if it has (so a logged-out returning customer isn't asked to
-  // register again). Done in an effect, not during render, since the check
-  // is async.
-  useEffect(() => {
-    if (session) return;
-    getHasAccount().then((hasAccount) => {
-      router.replace(hasAccount ? '/auth/login' : '/auth/register');
-    });
-  }, [session]);
 
   const addressId =
     explicitAddressId ??
@@ -146,7 +134,12 @@ export function CheckoutScreen() {
     }
   }
 
-  if (!session || cart.isLoading || addresses.isLoading || settings.isLoading) {
+  if (!session) {
+    router.replace('/auth/login');
+    return null;
+  }
+
+  if (cart.isLoading || addresses.isLoading || settings.isLoading) {
     return (
       <View style={[styles.loading, { backgroundColor: theme.background }]}>
         <ActivityIndicator color={theme.primary} />

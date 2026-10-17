@@ -10,13 +10,12 @@ import {
   View,
   type TextInputProps,
 } from 'react-native';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { setHasAccount } from '@/lib/account-history';
 import { goBack } from '@/lib/go-back';
 import { clearSavedCredentials, getSavedCredentials, setSavedCredentials } from '@/lib/saved-credentials';
 import { showAlert } from '@/lib/show-alert';
@@ -72,7 +71,6 @@ export function LoginScreen() {
       setFormError(error.message);
       return;
     }
-    await setHasAccount();
     if (savePassword) {
       await setSavedCredentials(values);
     } else {
@@ -183,17 +181,13 @@ export function LoginScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        <Pressable onPress={onGoogleContinue} style={styles.socialButton}>
+        <Pressable
+          onPress={onGoogleContinue}
+          style={[styles.socialButton, { marginBottom: Math.max(insets.bottom, spacing.lg) }]}
+        >
           <Ionicons name="logo-google" size={18} color={COLORS.heading} />
           <Text style={styles.socialLabel}>Continue with Google</Text>
         </Pressable>
-
-        <Text style={[styles.footer, { marginBottom: Math.max(insets.bottom, spacing.lg) }]}>
-          Don&apos;t have an account?{' '}
-          <Link href="/auth/register" asChild>
-            <Text style={styles.footerLink}>Sign Up.</Text>
-          </Link>
-        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -387,15 +381,5 @@ const styles = StyleSheet.create({
   socialLabel: {
     ...typography.bodyStrong,
     color: COLORS.heading,
-  },
-  footer: {
-    ...typography.body,
-    textAlign: 'center',
-    color: COLORS.subtitle,
-  },
-  footerLink: {
-    fontWeight: '700',
-    color: COLORS.heading,
-    textDecorationLine: 'underline',
   },
 });
