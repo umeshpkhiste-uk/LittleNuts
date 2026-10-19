@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    fontSize: 15,
+    ...typography.body,
   },
   newButton: {
     width: 40,

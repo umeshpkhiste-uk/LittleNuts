@@ -69,7 +69,7 @@ const createStyles = (COLORS: AppTheme) =>
       flex: 1,
       paddingHorizontal: spacing.sm,
       paddingVertical: spacing.sm + 2,
-      fontSize: 15,
+      ...typography.body,
       color: COLORS.heading,
     },
     inputRightIcon: {

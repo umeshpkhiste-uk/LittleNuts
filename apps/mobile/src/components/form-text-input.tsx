@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
-    fontSize: 15,
+    ...typography.body,
   },
   inputWithIcon: {
     paddingLeft: spacing.sm,

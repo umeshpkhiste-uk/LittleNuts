@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
-    fontSize: 15,
+    ...typography.body,
   },
   chipRow: {
     gap: spacing.sm,

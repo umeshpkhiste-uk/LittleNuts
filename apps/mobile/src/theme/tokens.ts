@@ -46,12 +46,23 @@ export const cardShadow = {
   elevation: 3,
 } as const;
 
+// 'System' is the platform's standard UI font (San Francisco on iOS,
+// Roboto on Android) — a no-op on native, where Text already defaults to
+// it. On web it matters: react-native-web's <Text> renders with no
+// font-family of its own and silently falls back to the browser's
+// default serif font unless one is set explicitly, while <input>
+// elements (TextInput) already get a sans-serif default from the
+// browser's own form-control styles — so without this, every text box
+// looked like it was in a different, more "standard" font than the
+// surrounding text. Naming it here makes both match everywhere.
+const fontFamily = 'System';
+
 export const typography = {
-  display: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
-  h1: { fontSize: 22, fontWeight: '700' as const, lineHeight: 28 },
-  h2: { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
-  body: { fontSize: 15, fontWeight: '400' as const, lineHeight: 21 },
-  bodyStrong: { fontSize: 15, fontWeight: '600' as const, lineHeight: 21 },
-  caption: { fontSize: 12, fontWeight: '400' as const, lineHeight: 16 },
-  price: { fontSize: 18, fontWeight: '700' as const, lineHeight: 22 },
+  display: { fontFamily, fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
+  h1: { fontFamily, fontSize: 22, fontWeight: '700' as const, lineHeight: 28 },
+  h2: { fontFamily, fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
+  body: { fontFamily, fontSize: 15, fontWeight: '400' as const, lineHeight: 21 },
+  bodyStrong: { fontFamily, fontSize: 15, fontWeight: '600' as const, lineHeight: 21 },
+  caption: { fontFamily, fontSize: 12, fontWeight: '400' as const, lineHeight: 16 },
+  price: { fontFamily, fontSize: 18, fontWeight: '700' as const, lineHeight: 22 },
 } as const;

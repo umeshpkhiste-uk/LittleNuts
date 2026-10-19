@@ -774,14 +774,17 @@ const createStyles = (COLORS: AppTheme) =>
     width: '48%',
     backgroundColor: COLORS.card,
     borderRadius: radius.lg,
-    overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.border,
+    padding: spacing.sm,
+    gap: spacing.sm,
     ...cardShadow,
   },
   cardImageWrap: {
     width: '100%',
     aspectRatio: 1,
+    borderRadius: radius.md,
+    overflow: 'hidden',
   },
   cardImage: {
     width: '100%',
@@ -833,7 +836,6 @@ const createStyles = (COLORS: AppTheme) =>
     color: COLORS.primaryText,
   },
   cardBody: {
-    padding: spacing.sm,
     gap: 2,
   },
   cardName: {
