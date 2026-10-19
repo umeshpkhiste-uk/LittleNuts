@@ -1,30 +1,11 @@
-// Two real themes now: the original dark glassmorphism look, and a light
-// cream-and-forest-green look (introduced screen-by-screen, now wired up as
-// an actual switchable theme — see theme-provider.tsx / theme-store.ts).
-// Both objects below implement the exact same `ThemeColors` shape so every
-// screen can read whichever is active through the one `useAppTheme()` hook,
-// regardless of which naming convention that screen happens to use
-// (textPrimary/surface/... from the original dark screens, or
-// heading/subtitle/card/... from the newer light-redesigned screens).
-export const palette = {
-  navyBase: '#0A0E17',
-  navyDeep: '#05070C',
-  glowGold: '#C8841E',
-  glowAmber: '#8A5A2A',
-  gold: '#E8A33D',
-  goldLight: '#F4C066',
-  goldDeep: '#B8781F',
-  green: '#4ADE80',
-  red: '#F2755A',
-  textPrimary: '#F4F1EA',
-  textSecondary: '#A9ADBE',
-  textMuted: '#7B8094',
-  glassWhite: 'rgba(255,255,255,0.06)',
-  glassWhiteStrong: 'rgba(255,255,255,0.1)',
-  glassBorder: 'rgba(255,255,255,0.12)',
-  glassBorderStrong: 'rgba(255,255,255,0.2)',
-} as const;
-
+// Light cream-and-forest-green theme — the app's one and only look. (A
+// dark glassmorphism theme existed earlier and briefly had a working
+// Light/Dark/Auto switch; both were removed in favor of a single
+// consistent light theme throughout the app.) `ThemeColors` carries two
+// naming conventions for the same values (textPrimary/surface/... from
+// the original screens, heading/subtitle/card/... from the newer ones)
+// so every screen can keep using whichever it already had, all reading
+// from this one object via useAppTheme().
 export const lightPalette = {
   cream: '#F8F3EA',
   card: '#FFFFFF',
@@ -43,8 +24,7 @@ export const lightPalette = {
 } as const;
 
 export type ThemeColors = {
-  mode: 'dark' | 'light';
-  // Original dark-glass naming.
+  mode: 'light';
   background: string;
   backgroundSolid: string;
   surface: string;
@@ -63,9 +43,6 @@ export type ThemeColors = {
   tabBarBackground: string;
   tabBarActive: string;
   tabBarInactive: string;
-  // Newer light-screen naming (Home/Categories/Product Details/Cart/
-  // Profile/onboarding/auth) — kept as aliases so those screens don't need
-  // their JSX/styles rewritten, only their color *source* swapped.
   heading: string;
   subtitle: string;
   button: string;
@@ -75,38 +52,9 @@ export type ThemeColors = {
   forgot: string;
 };
 
-export const darkTheme: ThemeColors = {
-  mode: 'dark',
-  background: 'transparent',
-  backgroundSolid: palette.navyBase,
-  surface: palette.glassWhite,
-  card: palette.glassWhite,
-  cardStrong: palette.glassWhiteStrong,
-  border: palette.glassBorder,
-  borderStrong: palette.glassBorderStrong,
-  primary: palette.gold,
-  primaryLight: palette.goldLight,
-  primaryText: '#1A1206',
-  accent: palette.green,
-  danger: palette.red,
-  textPrimary: palette.textPrimary,
-  textSecondary: palette.textSecondary,
-  textMuted: palette.textMuted,
-  tabBarBackground: 'rgba(10,14,23,0.72)',
-  tabBarActive: palette.gold,
-  tabBarInactive: palette.textMuted,
-  heading: palette.textPrimary,
-  subtitle: palette.textSecondary,
-  button: palette.gold,
-  badgeBg: 'rgba(255,255,255,0.08)',
-  badgeText: palette.textPrimary,
-  badgeDot: palette.green,
-  forgot: palette.red,
-};
-
 export const lightTheme: ThemeColors = {
   mode: 'light',
-  background: 'transparent',
+  background: lightPalette.cream,
   backgroundSolid: lightPalette.cream,
   surface: lightPalette.badgeBg,
   card: lightPalette.card,

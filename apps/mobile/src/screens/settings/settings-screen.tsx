@@ -2,18 +2,11 @@ import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-import { useAppTheme, useThemeMode } from '@/theme/theme-provider';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
-
-const THEME_LABEL: Record<string, string> = {
-  light: 'Light',
-  dark: 'Dark',
-  auto: 'Auto',
-};
 
 export function SettingsScreen() {
   const theme = useAppTheme();
-  const { mode } = useThemeMode();
 
   return (
     <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.container}>
@@ -21,12 +14,6 @@ export function SettingsScreen() {
         icon="notifications-outline"
         label="Notifications"
         onPress={() => router.push('/notifications')}
-      />
-      <SettingsRow
-        icon="color-palette-outline"
-        label="Theme"
-        value={THEME_LABEL[mode]}
-        onPress={() => router.push('/settings/theme')}
       />
       <SettingsRow
         icon="help-circle-outline"

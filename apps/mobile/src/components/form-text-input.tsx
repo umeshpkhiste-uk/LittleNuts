@@ -36,11 +36,7 @@ export function FormTextInput({
           shape === 'pill' && styles.inputWrapPill,
         ]}
       >
-        <BlurView
-          intensity={30}
-          tint={theme.mode === 'light' ? 'light' : 'dark'}
-          style={StyleSheet.absoluteFill}
-        />
+        <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
         {icon ? <Ionicons name={icon} size={18} color={theme.textMuted} style={styles.leftIcon} /> : null}
         <TextInput
           placeholderTextColor={theme.textMuted}

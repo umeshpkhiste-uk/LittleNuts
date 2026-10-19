@@ -2,7 +2,7 @@ import { Component, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '@/components/primary-button';
-import { palette } from '@/theme/colors';
+import { lightPalette } from '@/theme/colors';
 import { spacing, typography } from '@/theme/tokens';
 
 type Props = { children: ReactNode };
@@ -47,16 +47,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.lg,
     gap: spacing.md,
-    backgroundColor: palette.navyBase,
+    backgroundColor: lightPalette.cream,
   },
   title: {
     ...typography.h1,
     textAlign: 'center',
-    color: palette.textPrimary,
+    color: lightPalette.heading,
   },
   message: {
     ...typography.body,
     textAlign: 'center',
-    color: palette.textSecondary,
+    color: lightPalette.subtitle,
   },
 });

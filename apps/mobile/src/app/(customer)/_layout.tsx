@@ -23,7 +23,6 @@ export default function CustomerLayout() {
       <Stack.Screen name="checkout" options={{ title: 'Checkout' }} />
       <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
       <Stack.Screen name="settings/index" options={{ title: 'Settings' }} />
-      <Stack.Screen name="settings/theme" options={{ title: 'Theme' }} />
       <Stack.Screen name="favorites" options={{ title: 'Favorites' }} />
       <Stack.Screen name="legal/help-support" options={{ title: 'Help & Support' }} />
       <Stack.Screen name="legal/privacy-policy" options={{ title: 'Privacy Policy' }} />

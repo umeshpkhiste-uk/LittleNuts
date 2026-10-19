@@ -1,9 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View, type PressableProps } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { palette } from '@/theme/colors';
 import { useAppTheme } from '@/theme/theme-provider';
-import { goldGlowShadow, radius, spacing, typography } from '@/theme/tokens';
+import { radius, spacing, typography } from '@/theme/tokens';
 
 type PrimaryButtonProps = PressableProps & {
   title: string;
@@ -22,7 +20,6 @@ export function PrimaryButton({
   const theme = useAppTheme();
   const isPrimary = variant === 'primary';
   const isDisabled = disabled || loading;
-  const isLight = theme.mode === 'light';
 
   return (
     <Pressable
@@ -31,27 +28,15 @@ export function PrimaryButton({
         styles.wrap,
         !isPrimary && styles.secondaryWrap,
         !isPrimary && { borderColor: theme.border },
-        isPrimary && !isDisabled && !isLight && goldGlowShadow,
         { opacity: state.pressed ? 0.85 : isDisabled ? 0.5 : 1 },
         typeof style === 'function' ? style(state) : style,
       ]}
       {...pressableProps}
     >
       {isPrimary ? (
-        isLight ? (
-          <View style={[styles.fill, { backgroundColor: theme.primary }]}>
-            <ButtonContent loading={loading} title={title} color={theme.primaryText} />
-          </View>
-        ) : (
-          <LinearGradient
-            colors={[palette.goldLight, palette.gold, palette.goldDeep]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.fill}
-          >
-            <ButtonContent loading={loading} title={title} color={theme.primaryText} />
-          </LinearGradient>
-        )
+        <View style={[styles.fill, { backgroundColor: theme.primary }]}>
+          <ButtonContent loading={loading} title={title} color={theme.primaryText} />
+        </View>
       ) : (
         <View style={styles.fill}>
           <ButtonContent loading={loading} title={title} color={theme.textPrimary} />
