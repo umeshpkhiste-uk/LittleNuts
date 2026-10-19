@@ -22,7 +22,7 @@ import {
   type Product,
 } from '@littlenuts/shared';
 
-import { useAddToCart } from '@/hooks/cart/use-cart';
+import { useAddToCart, useCart } from '@/hooks/cart/use-cart';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
 import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
@@ -110,6 +110,8 @@ export function HomeScreen() {
 
   const categories = useCategories();
   const products = useProducts({});
+  const cart = useCart();
+  const cartCount = cart.data?.items.length ?? 0;
 
   const categoryById = useMemo(
     () => new Map((categories.data ?? []).map((category) => [category.id, category])),
@@ -168,8 +170,13 @@ export function HomeScreen() {
         <Pressable onPress={() => searchInputRef.current?.focus()} hitSlop={8} style={styles.headerIcon}>
           <Ionicons name="search" size={18} color={COLORS.heading} />
         </Pressable>
-        <Pressable onPress={() => router.push('/notifications')} hitSlop={8} style={styles.headerIcon}>
-          <Ionicons name="notifications-outline" size={18} color={COLORS.heading} />
+        <Pressable onPress={() => router.push('/cart')} hitSlop={8} style={styles.headerIcon}>
+          <Ionicons name="cart-outline" size={18} color={COLORS.heading} />
+          {cartCount > 0 ? (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{cartCount}</Text>
+            </View>
+          ) : null}
         </Pressable>
         <Pressable onPress={() => router.push('/account')} hitSlop={8} style={styles.avatarButton}>
           <Ionicons name="person" size={16} color={COLORS.card} />
@@ -441,6 +448,23 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.button,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    paddingHorizontal: 3,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.forgot,
+  },
+  cartBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: COLORS.card,
   },
   searchBar: {
     flexDirection: 'row',
