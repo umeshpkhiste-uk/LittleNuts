@@ -1,41 +1,95 @@
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Image } from 'expo-image';
+import { useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import type { Category } from '@littlenuts/shared';
+import {
+  formatWeight,
+  itemSubtotalPaise,
+  paiseToRupeesLabel,
+  type Category,
+  type Product,
+} from '@littlenuts/shared';
 
-import { CategoryPromoBanner } from '@/components/category-promo-banner';
-import { GlassSurface } from '@/components/glass-surface';
-import { useCart } from '@/hooks/cart/use-cart';
-import { useCategoryProductCounts } from '@/hooks/catalog/use-category-counts';
+import { useAddToCart, useCart, useSetCartItemQuantity } from '@/hooks/cart/use-cart';
 import { useCategories } from '@/hooks/catalog/use-categories';
-import { palette } from '@/theme/colors';
-import { useAppTheme } from '@/theme/theme-provider';
+import { useProducts } from '@/hooks/catalog/use-products';
+import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
 import { radius, spacing, typography } from '@/theme/tokens';
 
+// Redesigned to match the brand mockup (categories/catalog grid screen) —
+// same light cream-and-forest-green look as Home (see
+// src/theme/auth-light-palette.ts). Uses the real catalog and the same
+// product photos as Home, not fictional mockup placeholders. No star
+// rating (no backing field); heart/favorite is a non-persisted UI stub
+// like on Home; the +/- quantity control is real, backed by the same
+// cart used on Cart/Checkout.
+
+const TAG_PALETTE = [
+  { bg: '#E7ECDD', text: '#3F4B35' },
+  { bg: '#F3E0C7', text: '#8A5A2A' },
+  { bg: '#F6D9D3', text: '#B4432E' },
+  { bg: '#DCEAF0', text: '#2E6B82' },
+  { bg: '#F0E3F6', text: '#6B3F82' },
+  { bg: '#FBE8B8', text: '#8A6A1A' },
+] as const;
+
+function shortCategoryLabel(name: string): string {
+  return name.split('/')[0].trim();
+}
+
 export function CategoriesScreen() {
-  const theme = useAppTheme();
+  const [categoryId, setCategoryId] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<TextInput>(null);
+
   const categories = useCategories();
-  const counts = useCategoryProductCounts();
+  const products = useProducts({});
   const cart = useCart();
+
+  const categoryById = useMemo(
+    () => new Map((categories.data ?? []).map((category) => [category.id, category])),
+    [categories.data],
+  );
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const filtered = useMemo(
+    () =>
+      (products.data ?? []).filter((product) => {
+        if (categoryId !== 'all' && product.category_id !== categoryId) return false;
+        if (normalizedQuery && !product.name.toLowerCase().includes(normalizedQuery)) return false;
+        return true;
+      }),
+    [products.data, categoryId, normalizedQuery],
+  );
+
+  const activeCategory = categoryId === 'all' ? undefined : categoryById.get(categoryId);
+  const sectionTitle = activeCategory ? shortCategoryLabel(activeCategory.name) : 'Daily Essentials';
+  const sectionSubtitle = normalizedQuery
+    ? `Results for "${searchQuery.trim()}"`
+    : (activeCategory?.description ?? 'Handpicked whole harvest for today');
+
   const cartCount = cart.data?.items.length ?? 0;
+  const isLoading = products.isLoading || categories.isLoading;
 
   return (
     <ScrollView
-      style={{ backgroundColor: theme.background }}
+      style={[styles.screen, { backgroundColor: COLORS.background }]}
       contentContainerStyle={styles.container}
     >
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => (router.canGoBack() ? router.back() : router.push('/'))}
-          style={styles.iconButton}
-          hitSlop={8}
-        >
-          <Ionicons name="arrow-back" size={20} color={theme.textPrimary} />
-        </Pressable>
-        <Text style={[styles.title, { color: theme.textPrimary }]}>Categories</Text>
-        <Pressable onPress={() => router.push('/cart')} style={styles.iconButton} hitSlop={8}>
-          <Ionicons name="cart-outline" size={20} color={theme.textPrimary} />
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Categories</Text>
+        <Pressable onPress={() => router.push('/cart')} hitSlop={8} style={styles.cartButton}>
+          <Ionicons name="cart-outline" size={18} color={COLORS.heading} />
           {cartCount > 0 ? (
             <View style={styles.cartBadge}>
               <Text style={styles.cartBadgeText}>{cartCount}</Text>
@@ -44,86 +98,245 @@ export function CategoriesScreen() {
         </Pressable>
       </View>
 
-      {categories.isLoading ? (
-        <ActivityIndicator color={theme.primary} />
-      ) : (
-        <View style={styles.grid}>
-          {categories.data?.map((category) => (
-            <CategoryGridCard
+      <View style={styles.searchBar}>
+        <Ionicons name="search" size={18} color={COLORS.subtitle} />
+        <TextInput
+          ref={searchInputRef}
+          value={searchQuery}
+          onChangeText={(text) => {
+            setSearchQuery(text);
+            if (text) setCategoryId('all');
+          }}
+          placeholder="Search walnuts, dates, raw seeds..."
+          placeholderTextColor={COLORS.subtitle}
+          style={styles.searchInput}
+        />
+        {searchQuery ? (
+          <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+            <Ionicons name="close-circle" size={18} color={COLORS.subtitle} />
+          </Pressable>
+        ) : (
+          <Ionicons name="options-outline" size={18} color={COLORS.subtitle} />
+        )}
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.pillRow}
+      >
+        <Pressable
+          onPress={() => {
+            setCategoryId('all');
+            setSearchQuery('');
+          }}
+          style={[styles.pill, categoryId === 'all' ? styles.pillActive : styles.pillInactive]}
+        >
+          <Text style={[styles.pillLabel, { color: categoryId === 'all' ? COLORS.card : COLORS.heading }]}>
+            All
+          </Text>
+        </Pressable>
+        {categories.data?.map((category) => {
+          const active = categoryId === category.id;
+          return (
+            <Pressable
               key={category.id}
-              category={category}
-              itemCount={counts.data?.[category.id] ?? 0}
-              onPress={() => router.push(`/category/${category.id}`)}
+              onPress={() => {
+                setCategoryId(category.id);
+                setSearchQuery('');
+              }}
+              style={[styles.pill, active ? styles.pillActive : styles.pillInactive]}
+            >
+              <Text style={[styles.pillLabel, { color: active ? COLORS.card : COLORS.heading }]}>
+                {shortCategoryLabel(category.name)}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+        <Text numberOfLines={1} style={styles.sectionSubtitle}>
+          {sectionSubtitle}
+        </Text>
+      </View>
+
+      {isLoading ? (
+        <ActivityIndicator color={COLORS.button} style={styles.loading} />
+      ) : filtered.length ? (
+        <View style={styles.grid}>
+          {filtered.map((product, index) => (
+            <CategoryProductCard
+              key={product.id}
+              product={product}
+              category={categoryById.get(product.category_id)}
+              tagColor={TAG_PALETTE[index % TAG_PALETTE.length]}
+              onPress={() => router.push(`/product/${product.id}`)}
             />
           ))}
-          {/* Pad an incomplete last row so space-between doesn't spread
-              1-2 leftover cards across the full row width. */}
-          {Array.from({ length: (3 - ((categories.data?.length ?? 0) % 3)) % 3 }).map(
-            (_, index) => (
-              <View key={`spacer-${index}`} style={styles.cardPressable} />
-            ),
-          )}
         </View>
+      ) : (
+        <Text style={styles.emptyText}>No products match your search.</Text>
       )}
-
-      <CategoryPromoBanner />
     </ScrollView>
   );
 }
 
-function CategoryGridCard({
+function CategoryProductCard({
+  product,
   category,
-  itemCount,
+  tagColor,
   onPress,
 }: {
-  category: Category;
-  itemCount: number;
+  product: Product;
+  category: Category | undefined;
+  tagColor: (typeof TAG_PALETTE)[number];
   onPress: () => void;
 }) {
-  const theme = useAppTheme();
-  const displayName = category.name.split(' / ')[0];
+  const [liked, setLiked] = useState(false);
+  const cart = useCart();
+  const addToCart = useAddToCart();
+  const setQuantity = useSetCartItemQuantity();
+
+  const cartItem = cart.data?.items.find((item) => item.product_id === product.id);
+  const displayWeight = cartItem?.quantity_g ?? product.min_order_weight_g;
+  const price = itemSubtotalPaise(product.price_per_kg_paise, displayWeight);
+  const imageUri = product.image_urls[0];
+  const outOfStock = product.stock_weight_g < product.min_order_weight_g;
+  const step = product.weight_increment_g;
 
   return (
-    <Pressable onPress={onPress} style={styles.cardPressable}>
-      <GlassSurface style={styles.card} radius={radius.lg}>
-        <View style={styles.imageWrap}>
-          {category.image_url ? (
-            <Image source={{ uri: category.image_url }} style={styles.image} contentFit="cover" />
+    <Pressable onPress={onPress} style={styles.card}>
+      <View style={styles.cardImageWrap}>
+        {imageUri ? (
+          <ExpoImage source={{ uri: imageUri }} style={styles.cardImage} contentFit="cover" />
+        ) : (
+          <View style={[styles.cardImage, styles.cardImagePlaceholder]}>
+            <Ionicons name="nutrition-outline" size={32} color={COLORS.subtitle} />
+          </View>
+        )}
+        {category ? (
+          <View style={[styles.cardTag, { backgroundColor: tagColor.bg }]}>
+            <Text style={[styles.cardTagText, { color: tagColor.text }]} numberOfLines={1}>
+              {shortCategoryLabel(category.name)}
+            </Text>
+          </View>
+        ) : null}
+        <Pressable
+          onPress={(event) => {
+            event.stopPropagation();
+            setLiked((v) => !v);
+          }}
+          hitSlop={8}
+          style={styles.cardHeart}
+        >
+          <Ionicons
+            name={liked ? 'heart' : 'heart-outline'}
+            size={16}
+            color={liked ? tagColor.text : COLORS.subtitle}
+          />
+        </Pressable>
+        {outOfStock ? (
+          <View style={styles.outOfStockBadge}>
+            <Text style={styles.outOfStockText}>Out of stock</Text>
+          </View>
+        ) : null}
+      </View>
+
+      <View style={styles.cardBody}>
+        <Text numberOfLines={1} style={styles.cardName}>
+          {product.name}
+        </Text>
+        <Text style={styles.cardPack}>{formatWeight(product.min_order_weight_g)} pack</Text>
+
+        <View style={styles.cardDivider} />
+
+        <View style={styles.cardBottomRow}>
+          <Text style={styles.cardPrice}>{paiseToRupeesLabel(price)}</Text>
+
+          {outOfStock ? (
+            <View style={[styles.cardAddButton, styles.cardAddButtonDisabled]}>
+              <Ionicons name="add" size={18} color={COLORS.card} />
+            </View>
+          ) : cartItem ? (
+            <View style={styles.stepper}>
+              <Pressable
+                onPress={(event) => {
+                  event.stopPropagation();
+                  setQuantity.mutate({
+                    cartItemId: cartItem.id,
+                    quantityG: Math.max(0, cartItem.quantity_g - step),
+                  });
+                }}
+                hitSlop={6}
+                style={styles.stepperButton}
+              >
+                <Ionicons name="remove" size={14} color={COLORS.heading} />
+              </Pressable>
+              <Text numberOfLines={1} style={styles.stepperValue}>
+                {formatWeight(cartItem.quantity_g)}
+              </Text>
+              <Pressable
+                onPress={(event) => {
+                  event.stopPropagation();
+                  setQuantity.mutate({
+                    cartItemId: cartItem.id,
+                    quantityG: cartItem.quantity_g + step,
+                  });
+                }}
+                hitSlop={6}
+                style={[styles.stepperButton, styles.stepperButtonPrimary]}
+              >
+                <Ionicons name="add" size={14} color={COLORS.card} />
+              </Pressable>
+            </View>
           ) : (
-            <Ionicons name="leaf-outline" size={28} color={theme.primary} />
+            <Pressable
+              onPress={(event) => {
+                event.stopPropagation();
+                addToCart.mutate({ productId: product.id, quantityG: product.min_order_weight_g });
+              }}
+              disabled={addToCart.isPending}
+              hitSlop={8}
+              style={styles.cardAddButton}
+            >
+              <Ionicons name="add" size={18} color={COLORS.card} />
+            </Pressable>
           )}
         </View>
-        <Text numberOfLines={1} style={[styles.name, { color: theme.textPrimary }]}>
-          {displayName}
-        </Text>
-        <Text style={[styles.count, { color: theme.textSecondary }]}>
-          {itemCount} {itemCount === 1 ? 'item' : 'items'}
-        </Text>
-      </GlassSurface>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   container: {
     padding: spacing.lg,
-    gap: spacing.lg,
+    gap: spacing.md,
     paddingBottom: spacing.xxl,
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   title: {
     ...typography.h1,
+    color: COLORS.heading,
+  },
+  cartButton: {
+    width: 34,
+    height: 34,
+    borderRadius: radius.pill,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cartBadge: {
     position: 'absolute',
@@ -135,12 +348,71 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: palette.gold,
+    backgroundColor: COLORS.forgot,
   },
   cartBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: palette.navyBase,
+    color: COLORS.card,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: radius.lg,
+    backgroundColor: COLORS.card,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+  },
+  searchInput: {
+    ...typography.body,
+    flex: 1,
+    color: COLORS.heading,
+    paddingVertical: 0,
+  },
+  pillRow: {
+    gap: spacing.sm,
+    paddingRight: spacing.md,
+  },
+  pill: {
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+  },
+  pillActive: {
+    backgroundColor: COLORS.button,
+    borderColor: COLORS.button,
+  },
+  pillInactive: {
+    backgroundColor: COLORS.card,
+    borderColor: COLORS.border,
+  },
+  pillLabel: {
+    ...typography.caption,
+    fontWeight: '700',
+  },
+  sectionHeader: {
+    gap: 2,
+  },
+  sectionTitle: {
+    ...typography.h1,
+    color: COLORS.heading,
+  },
+  sectionSubtitle: {
+    ...typography.caption,
+    color: COLORS.subtitle,
+  },
+  loading: {
+    marginTop: spacing.xl,
+  },
+  emptyText: {
+    ...typography.body,
+    color: COLORS.subtitle,
+    textAlign: 'center',
+    marginTop: spacing.xl,
   },
   grid: {
     flexDirection: 'row',
@@ -148,32 +420,125 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: spacing.md,
   },
-  cardPressable: {
-    width: '31%',
-  },
   card: {
-    padding: spacing.sm,
-    gap: spacing.xs,
+    width: '48%',
+    backgroundColor: COLORS.card,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  imageWrap: {
+  cardImageWrap: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.04)',
   },
-  image: {
+  cardImage: {
     width: '100%',
     height: '100%',
   },
-  name: {
-    ...typography.bodyStrong,
-    textAlign: 'center',
+  cardImagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.background,
   },
-  count: {
+  cardTag: {
+    position: 'absolute',
+    top: spacing.sm,
+    left: spacing.sm,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    maxWidth: '70%',
+  },
+  cardTagText: {
     ...typography.caption,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  cardHeart: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 26,
+    height: 26,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  outOfStockBadge: {
+    position: 'absolute',
+    bottom: spacing.sm,
+    left: spacing.sm,
+    right: spacing.sm,
+    borderRadius: radius.sm,
+    paddingVertical: 3,
+    alignItems: 'center',
+    backgroundColor: COLORS.forgot,
+  },
+  outOfStockText: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: COLORS.card,
+  },
+  cardBody: {
+    padding: spacing.sm,
+    gap: 2,
+  },
+  cardName: {
+    ...typography.bodyStrong,
+    color: COLORS.heading,
+  },
+  cardPack: {
+    ...typography.caption,
+    color: COLORS.subtitle,
+  },
+  cardDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: COLORS.border,
+    marginVertical: spacing.xs,
+  },
+  cardBottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardPrice: {
+    ...typography.bodyStrong,
+    color: COLORS.heading,
+  },
+  cardAddButton: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
+    backgroundColor: COLORS.button,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardAddButtonDisabled: {
+    opacity: 0.4,
+  },
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  stepperButton: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.pill,
+    backgroundColor: COLORS.badgeBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepperButtonPrimary: {
+    backgroundColor: COLORS.button,
+  },
+  stepperValue: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: COLORS.heading,
+    minWidth: 40,
     textAlign: 'center',
   },
 });
