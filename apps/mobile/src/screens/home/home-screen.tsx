@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -25,10 +24,11 @@ import {
 import { useAddToCart, useCart } from '@/hooks/cart/use-cart';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
+import { useProfile } from '@/hooks/profile/use-profile';
 import { FavoriteButton } from '@/components/favorite-button';
 import type { AppTheme } from '@/theme/colors';
 import { useAppTheme } from '@/theme/theme-provider';
-import { radius, spacing, typography } from '@/theme/tokens';
+import { cardShadow, radius, spacing, typography } from '@/theme/tokens';
 
 // Logged-in landing page, redesigned to match the brand mockup at
 // design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
@@ -103,6 +103,11 @@ function shortCategoryLabel(name: string): string {
   return name.split('/')[0].trim();
 }
 
+function firstName(fullName: string | null | undefined): string {
+  if (!fullName) return 'there';
+  return fullName.trim().split(/\s+/)[0];
+}
+
 export function HomeScreen() {
   const COLORS = useAppTheme();
   const styles = useMemo(() => createStyles(COLORS), [COLORS]);
@@ -115,6 +120,7 @@ export function HomeScreen() {
   const categories = useCategories();
   const products = useProducts({});
   const cart = useCart();
+  const profile = useProfile();
   const cartCount = cart.data?.items.length ?? 0;
 
   const categoryById = useMemo(
@@ -157,23 +163,24 @@ export function HomeScreen() {
 
   const isLoading = products.isLoading || categories.isLoading;
 
+  const popular = useMemo(
+    () =>
+      (products.data ?? [])
+        .filter((product) => product.is_featured)
+        .slice(0, 8),
+    [products.data],
+  );
+
   return (
     <ScrollView
       style={[styles.screen, { backgroundColor: COLORS.background }]}
       contentContainerStyle={styles.container}
     >
       <View style={styles.headerRow}>
-        <Image source={require('../../../assets/icon.png')} style={styles.logo} resizeMode="cover" />
         <View style={styles.headerText}>
-          <Text style={styles.brand}>LittleNuts</Text>
-          <View style={styles.deliveryRow}>
-            <Ionicons name="location" size={12} color={COLORS.accent} />
-            <Text style={styles.deliveryText}>Deliver to Home · 24 mins</Text>
-          </View>
+          <Text style={styles.greeting}>Hi, {firstName(profile.data?.full_name)} 👋</Text>
+          <Text style={styles.greetingSubtitle}>What would you like to buy today?</Text>
         </View>
-        <Pressable onPress={() => searchInputRef.current?.focus()} hitSlop={8} style={styles.headerIcon}>
-          <Ionicons name="search" size={18} color={COLORS.heading} />
-        </Pressable>
         <Pressable onPress={() => router.push('/cart')} hitSlop={8} style={styles.headerIcon}>
           <Ionicons name="cart-outline" size={18} color={COLORS.heading} />
           {cartCount > 0 ? (
@@ -269,6 +276,36 @@ export function HomeScreen() {
         </View>
       </View>
 
+      {popular.length ? (
+        <View style={styles.popularSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Popular Products</Text>
+            <Pressable
+              onPress={() => {
+                setGroup('all');
+                setSearchQuery('');
+                setSortMode('featured');
+              }}
+              hitSlop={8}
+              style={styles.seeAllLink}
+            >
+              <Text style={styles.seeAllText}>See All</Text>
+              <Ionicons name="chevron-forward" size={14} color={COLORS.accent} />
+            </Pressable>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.popularRow}>
+            {popular.map((product) => (
+              <PopularCard
+                key={product.id}
+                product={product}
+                weightPreset={weightPreset}
+                onPress={() => router.push(`/product/${product.id}`)}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      ) : null}
+
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleRow}>
           <Text style={styles.sectionTitle}>Boutique Collection</Text>
@@ -303,6 +340,60 @@ export function HomeScreen() {
         <Text style={styles.emptyText}>No products match your search.</Text>
       )}
     </ScrollView>
+  );
+}
+
+function PopularCard({
+  product,
+  weightPreset,
+  onPress,
+}: {
+  product: Product;
+  weightPreset: WeightOption;
+  onPress: () => void;
+}) {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
+  const addToCart = useAddToCart();
+  const [justAdded, setJustAdded] = useState(false);
+
+  const displayWeight = resolveDisplayWeight(product, weightPreset);
+  const price = itemSubtotalPaise(product.price_per_kg_paise, displayWeight);
+  const imageUri = product.image_urls[0];
+  const outOfStock = product.stock_weight_g < product.min_order_weight_g;
+
+  return (
+    <Pressable onPress={onPress} style={styles.popularCard}>
+      <View style={styles.popularImageWrap}>
+        {imageUri ? (
+          <ExpoImage source={{ uri: imageUri }} style={styles.popularImage} contentFit="cover" />
+        ) : (
+          <View style={[styles.popularImage, styles.cardImagePlaceholder]}>
+            <Ionicons name="nutrition-outline" size={26} color={COLORS.subtitle} />
+          </View>
+        )}
+      </View>
+      <Text numberOfLines={1} style={styles.popularName}>
+        {product.name}
+      </Text>
+      <View style={styles.popularBottomRow}>
+        <Text style={styles.popularPrice}>{paiseToRupeesLabel(price)}</Text>
+        <Pressable
+          onPress={(event) => {
+            event.stopPropagation();
+            if (outOfStock) return;
+            addToCart.mutate({ productId: product.id, quantityG: displayWeight });
+            setJustAdded(true);
+            setTimeout(() => setJustAdded(false), 1200);
+          }}
+          disabled={outOfStock || addToCart.isPending}
+          hitSlop={8}
+          style={[styles.popularAddButton, outOfStock && styles.cardAddButtonDisabled]}
+        >
+          <Ionicons name={justAdded ? 'checkmark' : 'add'} size={14} color={COLORS.primaryText} />
+        </Pressable>
+      </View>
+    </Pressable>
   );
 }
 
@@ -411,45 +502,37 @@ const createStyles = (COLORS: AppTheme) =>
     alignItems: 'center',
     gap: spacing.sm,
   },
-  logo: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.sm,
-  },
   headerText: {
     flex: 1,
     gap: 2,
   },
-  brand: {
-    ...typography.bodyStrong,
+  greeting: {
+    ...typography.h1,
     color: COLORS.heading,
   },
-  deliveryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  deliveryText: {
+  greetingSubtitle: {
     ...typography.caption,
     color: COLORS.subtitle,
   },
   headerIcon: {
-    width: 34,
-    height: 34,
+    width: 38,
+    height: 38,
     borderRadius: radius.pill,
     backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
+    ...cardShadow,
   },
   avatarButton: {
-    width: 34,
-    height: 34,
+    width: 38,
+    height: 38,
     borderRadius: radius.pill,
     backgroundColor: COLORS.button,
     alignItems: 'center',
     justifyContent: 'center',
+    ...cardShadow,
   },
   cartBadge: {
     position: 'absolute',
@@ -478,6 +561,7 @@ const createStyles = (COLORS: AppTheme) =>
     backgroundColor: COLORS.card,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
+    ...cardShadow,
   },
   searchInput: {
     ...typography.body,
@@ -543,6 +627,11 @@ const createStyles = (COLORS: AppTheme) =>
     backgroundColor: COLORS.button,
     borderRadius: radius.lg,
     padding: spacing.lg,
+    shadowColor: COLORS.button,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 18,
+    elevation: 6,
   },
   promoText: {
     flex: 1,
@@ -604,6 +693,66 @@ const createStyles = (COLORS: AppTheme) =>
     fontWeight: '700',
     color: COLORS.accent,
   },
+  popularSection: {
+    gap: spacing.sm,
+  },
+  seeAllLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  seeAllText: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: COLORS.accent,
+  },
+  popularRow: {
+    gap: spacing.md,
+    paddingRight: spacing.md,
+  },
+  popularCard: {
+    width: 128,
+    backgroundColor: COLORS.card,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: spacing.sm,
+    gap: 4,
+    ...cardShadow,
+  },
+  popularImageWrap: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+  },
+  popularImage: {
+    width: '100%',
+    height: '100%',
+  },
+  popularName: {
+    ...typography.bodyStrong,
+    fontSize: 13,
+    color: COLORS.heading,
+  },
+  popularBottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  popularPrice: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: COLORS.heading,
+  },
+  popularAddButton: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.pill,
+    backgroundColor: COLORS.button,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   loading: {
     marginTop: spacing.xl,
   },
@@ -626,6 +775,7 @@ const createStyles = (COLORS: AppTheme) =>
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.border,
+    ...cardShadow,
   },
   cardImageWrap: {
     width: '100%',
