@@ -10,7 +10,7 @@ type IconName = keyof typeof Ionicons.glyphMap;
 const TAB_ICONS: Record<string, { active: IconName; inactive: IconName }> = {
   index: { active: 'home', inactive: 'home-outline' },
   categories: { active: 'grid', inactive: 'grid-outline' },
-  cart: { active: 'bag', inactive: 'bag-outline' },
+  favorites: { active: 'heart', inactive: 'heart-outline' },
   orders: { active: 'receipt', inactive: 'receipt-outline' },
   account: { active: 'person', inactive: 'person-outline' },
 };
@@ -36,7 +36,7 @@ export function CustomTabBar({ state, descriptors, navigation, insets }: BottomT
             typeof options.title === 'string' ? options.title : (route.name as string);
           const isFocused = state.index === index;
           const icons = TAB_ICONS[route.name] ?? TAB_ICONS.index;
-          const isRaised = route.name === 'cart';
+          const isRaised = route.name === 'favorites';
           const badge = options.tabBarBadge;
 
           function onPress() {

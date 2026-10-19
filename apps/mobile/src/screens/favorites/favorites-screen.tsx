@@ -44,6 +44,7 @@ export function FavoritesScreen() {
 
   return (
     <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.container}>
+      <Text style={[styles.title, { color: theme.textPrimary }]}>Favorites</Text>
       <Text style={[styles.count, { color: theme.textSecondary }]}>
         {favoriteProducts.length} {favoriteProducts.length === 1 ? 'item' : 'items'}
       </Text>
@@ -136,8 +137,12 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingBottom: spacing.xxl,
   },
+  title: {
+    ...typography.h1,
+  },
   count: {
     ...typography.caption,
+    marginTop: -spacing.sm,
   },
   loading: {
     marginTop: spacing.xl,

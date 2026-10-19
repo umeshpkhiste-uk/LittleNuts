@@ -177,6 +177,9 @@ export function HomeScreen() {
       contentContainerStyle={styles.container}
     >
       <View style={styles.headerRow}>
+        <Pressable onPress={() => router.push('/account')} hitSlop={8} style={styles.avatarButton}>
+          <Ionicons name="person" size={16} color={COLORS.primaryText} />
+        </Pressable>
         <View style={styles.headerText}>
           <Text style={styles.greeting}>Hi, {firstName(profile.data?.full_name)} 👋</Text>
           <Text style={styles.greetingSubtitle}>What would you like to buy today?</Text>
@@ -188,9 +191,6 @@ export function HomeScreen() {
               <Text style={styles.cartBadgeText}>{cartCount}</Text>
             </View>
           ) : null}
-        </Pressable>
-        <Pressable onPress={() => router.push('/account')} hitSlop={8} style={styles.avatarButton}>
-          <Ionicons name="person" size={16} color={COLORS.primaryText} />
         </Pressable>
       </View>
 
@@ -212,7 +212,9 @@ export function HomeScreen() {
             <Ionicons name="close-circle" size={18} color={COLORS.subtitle} />
           </Pressable>
         ) : (
-          <Ionicons name="options-outline" size={18} color={COLORS.subtitle} />
+          <Pressable hitSlop={8}>
+            <Ionicons name="mic-outline" size={18} color={COLORS.subtitle} />
+          </Pressable>
         )}
       </View>
 

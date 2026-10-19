@@ -17,13 +17,13 @@ export default function CustomerLayout() {
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="cart" options={{ headerShown: false }} />
       <Stack.Screen name="search" options={{ title: 'Search' }} />
       <Stack.Screen name="category/[id]" options={{ title: 'Category' }} />
       <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="checkout" options={{ title: 'Checkout' }} />
       <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
       <Stack.Screen name="settings/index" options={{ title: 'Settings' }} />
-      <Stack.Screen name="favorites" options={{ title: 'Favorites' }} />
       <Stack.Screen name="legal/help-support" options={{ title: 'Help & Support' }} />
       <Stack.Screen name="legal/privacy-policy" options={{ title: 'Privacy Policy' }} />
       <Stack.Screen name="legal/terms" options={{ title: 'Terms & Conditions' }} />

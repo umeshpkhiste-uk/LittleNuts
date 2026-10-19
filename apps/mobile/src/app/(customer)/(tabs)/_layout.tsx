@@ -1,13 +1,13 @@
 import { Tabs } from 'expo-router';
 
 import { CustomTabBar } from '@/components/custom-tab-bar';
-import { useCart } from '@/hooks/cart/use-cart';
+import { useFavorites } from '@/hooks/favorites/use-favorites';
 import { useAppTheme } from '@/theme/theme-provider';
 
 export default function CustomerTabsLayout() {
   const theme = useAppTheme();
-  const cart = useCart();
-  const cartCount = cart.data?.items.length ?? 0;
+  const favorites = useFavorites();
+  const favoritesCount = favorites.data?.length ?? 0;
 
   return (
     <Tabs
@@ -25,10 +25,10 @@ export default function CustomerTabsLayout() {
       <Tabs.Screen name="index" options={{ title: 'Home' }} />
       <Tabs.Screen name="categories" options={{ title: 'Menu' }} />
       <Tabs.Screen
-        name="cart"
+        name="favorites"
         options={{
-          title: 'Cart',
-          tabBarBadge: cartCount > 0 ? cartCount : undefined,
+          title: 'Favorite',
+          tabBarBadge: favoritesCount > 0 ? favoritesCount : undefined,
         }}
       />
       <Tabs.Screen name="orders" options={{ title: 'Orders' }} />
