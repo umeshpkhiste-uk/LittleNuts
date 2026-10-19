@@ -75,77 +75,91 @@ export function AccountScreen() {
 
   return (
     <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.container}>
-      <Text style={[styles.pageTitle, { color: theme.textPrimary }]}>My Profile</Text>
-
-      <View style={[styles.profileCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <View style={[styles.avatarCircle, { backgroundColor: theme.primary }]}>
+      <View style={styles.hero}>
+        <View style={styles.heroBannerWrap}>
+          {/* The logo banner is fixed branding behind every customer's
+              avatar — it is not a user-uploaded cover photo and never
+              changes per account. */}
+          <Image source={require('../../../assets/icon.png')} style={styles.heroBanner} resizeMode="cover" />
+        </View>
+        <View
+          style={[
+            styles.avatarCircle,
+            styles.heroAvatar,
+            { backgroundColor: theme.primary, borderColor: theme.background },
+          ]}
+        >
           <Text style={[styles.avatarInitials, { color: theme.primaryText }]}>{initials}</Text>
         </View>
-        <View style={styles.profileTextWrap}>
-          <Text style={[styles.profileName, { color: theme.textPrimary }]}>{displayName}</Text>
-          {session.user.email ? (
-            <View style={styles.profileMetaRow}>
-              <Ionicons name="mail-outline" size={13} color={theme.textSecondary} />
-              <Text style={[styles.profileMetaText, { color: theme.textSecondary }]}>{session.user.email}</Text>
-            </View>
-          ) : null}
-          {profile.data?.phone_number ? (
-            <View style={styles.profileMetaRow}>
-              <Ionicons name="call-outline" size={13} color={theme.textSecondary} />
-              <Text style={[styles.profileMetaText, { color: theme.textSecondary }]}>
-                {profile.data.phone_number}
-              </Text>
-            </View>
-          ) : null}
+      </View>
+
+      <View style={styles.heroTextWrap}>
+        <Text style={[styles.profileName, { color: theme.textPrimary }]}>{displayName}</Text>
+        <Text style={[styles.profileRole, { color: theme.accent }]}>Customer</Text>
+        {session.user.email ? (
+          <View style={styles.profileMetaRow}>
+            <Ionicons name="mail-outline" size={13} color={theme.textSecondary} />
+            <Text style={[styles.profileMetaText, { color: theme.textSecondary }]}>{session.user.email}</Text>
+          </View>
+        ) : null}
+        {profile.data?.phone_number ? (
+          <View style={styles.profileMetaRow}>
+            <Ionicons name="call-outline" size={13} color={theme.textSecondary} />
+            <Text style={[styles.profileMetaText, { color: theme.textSecondary }]}>
+              {profile.data.phone_number}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+
+      <View style={styles.content}>
+        <View style={styles.statsRow}>
+          <StatBox value={String(ordersCount)} label="Orders Built" />
+          <StatBox value={String(favoritesCount)} label="Favorite Items" />
+          <StatBox value={paiseToRupeesLabel(savedTillDate)} label="Saved till Date" />
         </View>
+
+        <View style={styles.menu}>
+          <MenuRow
+            icon="receipt-outline"
+            label="My Orders"
+            hint={`${ordersCount} ${ordersCount === 1 ? 'order' : 'orders'}`}
+            onPress={() => router.push('/(customer)/(tabs)/orders')}
+          />
+          <MenuRow
+            icon="location-outline"
+            label="Address"
+            hint={`${addressesCount} saved`}
+            onPress={() => router.push('/addresses')}
+          />
+          <MenuRow
+            icon="heart-outline"
+            label="Favorite"
+            hint={`${favoritesCount} ${favoritesCount === 1 ? 'item' : 'items'}`}
+            onPress={() => router.push('/favorites')}
+          />
+          <MenuRow icon="settings-outline" label="Settings" onPress={() => router.push('/settings')} />
+        </View>
+
+        <Pressable
+          style={[styles.signOutButton, { borderColor: theme.danger }]}
+          onPress={handleSignOut}
+        >
+          <Ionicons name="log-out-outline" size={16} color={theme.danger} />
+          <Text style={[styles.signOutText, { color: theme.danger }]}>Sign Out of LittleNuts</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.deleteAccountButton, { borderColor: theme.border }]}
+          onPress={handleDeleteAccount}
+        >
+          <Ionicons name="trash-outline" size={16} color={theme.textSecondary} />
+          <Text style={[styles.deleteAccountText, { color: theme.textSecondary }]}>Delete My Account</Text>
+        </Pressable>
+
+        <Pressable onPress={() => router.push('/auth/admin-login')} hitSlop={8} style={styles.adminLink}>
+          <Text style={[styles.adminLinkText, { color: theme.textSecondary }]}>Store Admin</Text>
+        </Pressable>
       </View>
-
-      <View style={styles.statsRow}>
-        <StatBox value={String(ordersCount)} label="Orders Built" />
-        <StatBox value={String(favoritesCount)} label="Favorite Items" />
-        <StatBox value={paiseToRupeesLabel(savedTillDate)} label="Saved till Date" />
-      </View>
-
-      <View style={styles.menu}>
-        <MenuRow
-          icon="receipt-outline"
-          label="My Orders"
-          hint={`${ordersCount} ${ordersCount === 1 ? 'order' : 'orders'}`}
-          onPress={() => router.push('/(customer)/(tabs)/orders')}
-        />
-        <MenuRow
-          icon="location-outline"
-          label="Address"
-          hint={`${addressesCount} saved`}
-          onPress={() => router.push('/addresses')}
-        />
-        <MenuRow
-          icon="heart-outline"
-          label="Favorite"
-          hint={`${favoritesCount} ${favoritesCount === 1 ? 'item' : 'items'}`}
-          onPress={() => router.push('/favorites')}
-        />
-        <MenuRow icon="settings-outline" label="Settings" onPress={() => router.push('/settings')} />
-      </View>
-
-      <Pressable
-        style={[styles.signOutButton, { borderColor: theme.danger }]}
-        onPress={handleSignOut}
-      >
-        <Ionicons name="log-out-outline" size={16} color={theme.danger} />
-        <Text style={[styles.signOutText, { color: theme.danger }]}>Sign Out of LittleNuts</Text>
-      </Pressable>
-      <Pressable
-        style={[styles.deleteAccountButton, { borderColor: theme.border }]}
-        onPress={handleDeleteAccount}
-      >
-        <Ionicons name="trash-outline" size={16} color={theme.textSecondary} />
-        <Text style={[styles.deleteAccountText, { color: theme.textSecondary }]}>Delete My Account</Text>
-      </Pressable>
-
-      <Pressable onPress={() => router.push('/auth/admin-login')} hitSlop={8} style={styles.adminLink}>
-        <Text style={[styles.adminLinkText, { color: theme.textSecondary }]}>Store Admin</Text>
-      </Pressable>
     </ScrollView>
   );
 }
@@ -221,20 +235,26 @@ const styles = StyleSheet.create({
     ...typography.bodyStrong,
   },
   container: {
-    padding: spacing.lg,
     gap: spacing.md,
     paddingBottom: spacing.xxl,
   },
-  pageTitle: {
-    ...typography.h1,
-  },
-  profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  content: {
+    paddingHorizontal: spacing.lg,
     gap: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    padding: spacing.md,
+  },
+  hero: {
+    alignItems: 'center',
+  },
+  heroBannerWrap: {
+    width: '100%',
+    height: 150,
+    overflow: 'hidden',
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
+  },
+  heroBanner: {
+    width: '100%',
+    height: '100%',
   },
   avatarCircle: {
     width: 56,
@@ -243,16 +263,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  heroAvatar: {
+    width: 96,
+    height: 96,
+    marginTop: -48,
+    borderWidth: 4,
+  },
   avatarInitials: {
     ...typography.h2,
   },
-  profileTextWrap: {
-    flex: 1,
+  heroTextWrap: {
+    alignItems: 'center',
     gap: 2,
+    paddingHorizontal: spacing.lg,
   },
   profileName: {
+    ...typography.h1,
+  },
+  profileRole: {
     ...typography.bodyStrong,
-    fontSize: 17,
+    marginBottom: 2,
   },
   profileMetaRow: {
     flexDirection: 'row',

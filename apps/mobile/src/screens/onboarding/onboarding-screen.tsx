@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,35 +7,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { setOnboardingComplete } from '@/lib/onboarding';
 import { supabase } from '@/lib/supabase/client';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 // First-run welcome screen (shown once — see src/lib/onboarding.ts for the
-// AsyncStorage flag). Deliberately its own light, cream-and-forest-green
-// look, matching the brand's onboarding mockup
-// (design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
-// littlenuts_welcome_screen/screen.png) rather than the app's usual dark
-// glass theme — this screen is the one-time brand intro, everything after
-// it (including the rest of onboarding, if more screens are added later)
-// stays on the dark theme. "Continue"/"Skip" both set the onboarding flag
-// and hand off to sign-up or the customer shell depending on session state.
-const COLORS = {
-  background: '#F8F3EA',
-  card: '#FFFFFF',
-  badgeBg: '#E7ECDD',
-  badgeDot: '#5B7B4A',
-  badgeText: '#3F4B35',
-  skipText: '#9A978C',
-  dotActive: '#1F2E22',
-  dotInactive: '#DAD5C8',
-  heading: '#1C2A1E',
-  subtitle: '#8B8A80',
-  button: '#17241B',
-} as const;
-
+// AsyncStorage flag). Reads the same app theme as everywhere else (see
+// src/theme/colors.ts) so its Continue button and accents stay in sync
+// with the rest of the app's brand color instead of a separately
+// hand-picked palette.
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export function OnboardingScreen() {
   const insets = useSafeAreaInsets();
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
 
   async function handleContinue() {
     await setOnboardingComplete();
@@ -81,7 +68,7 @@ export function OnboardingScreen() {
         style={[styles.cta, { marginBottom: Math.max(insets.bottom, spacing.lg) }]}
       >
         <Text style={styles.ctaLabel}>Continue</Text>
-        <Ionicons name="arrow-forward" size={18} color={COLORS.card} />
+        <Ionicons name="arrow-forward" size={18} color={COLORS.primaryText} />
       </Pressable>
 
       <Link href="/auth/login" asChild>
@@ -98,7 +85,8 @@ export function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacing.xl,
@@ -131,7 +119,7 @@ const styles = StyleSheet.create({
   },
   skip: {
     ...typography.body,
-    color: COLORS.skipText,
+    color: COLORS.subtitle,
   },
   card: {
     marginTop: spacing.xl,
@@ -163,11 +151,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: radius.pill,
-    backgroundColor: COLORS.dotInactive,
+    backgroundColor: COLORS.borderStrong,
   },
   dotActive: {
     width: 20,
-    backgroundColor: COLORS.dotActive,
+    backgroundColor: COLORS.primary,
   },
   title: {
     ...typography.display,
@@ -186,14 +174,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: COLORS.button,
+    backgroundColor: COLORS.primary,
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
     marginTop: spacing.xl,
   },
   ctaLabel: {
     ...typography.bodyStrong,
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   footer: {
     ...typography.body,
