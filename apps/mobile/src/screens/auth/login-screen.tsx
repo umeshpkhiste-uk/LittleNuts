@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
@@ -12,14 +12,17 @@ import { clearSavedCredentials, getSavedCredentials, setSavedCredentials } from 
 import { showAlert } from '@/lib/show-alert';
 import { supabase } from '@/lib/supabase/client';
 import { loginSchema, type LoginInput } from '@/lib/validation/auth';
-import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 // Light, cream-and-forest-green look shared with the welcome and register
-// screens (see src/theme/auth-light-palette.ts) — matches the brand
+// screens (see src/theme/colors.ts) — matches the brand
 // mockup at design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
 // littlenuts_sign_in_screen/screen.png.
 export function LoginScreen() {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const insets = useSafeAreaInsets();
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -140,7 +143,7 @@ export function LoginScreen() {
           <View style={styles.optionsRow}>
             <Pressable onPress={() => setSavePassword((v) => !v)} hitSlop={8} style={styles.saveRow}>
               <View style={[styles.checkbox, savePassword && styles.checkboxChecked]}>
-                {savePassword ? <Ionicons name="checkmark" size={14} color={COLORS.card} /> : null}
+                {savePassword ? <Ionicons name="checkmark" size={14} color={COLORS.primaryText} /> : null}
               </View>
               <Text style={styles.saveLabel}>Save password</Text>
             </Pressable>
@@ -176,7 +179,8 @@ export function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingHorizontal: spacing.xl,
@@ -267,7 +271,7 @@ const styles = StyleSheet.create({
   },
   ctaLabel: {
     ...typography.bodyStrong,
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   dividerRow: {
     flexDirection: 'row',

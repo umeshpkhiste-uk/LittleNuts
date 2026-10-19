@@ -1,17 +1,21 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
-import { useCreateAddress } from '@/hooks/addresses/use-addresses';
+import { useCreateAddress, type RecipientType } from '@/hooks/addresses/use-addresses';
 import { useAppTheme } from '@/theme/theme-provider';
-import { spacing, typography } from '@/theme/tokens';
+import { radius, spacing, typography } from '@/theme/tokens';
 
 export function NewAddressScreen() {
   const theme = useAppTheme();
   const createAddress = useCreateAddress();
+  const params = useLocalSearchParams<{ type?: string }>();
 
+  const [recipientType, setRecipientType] = useState<RecipientType>(
+    params.type === 'other' ? 'other' : 'own',
+  );
   const [recipientName, setRecipientName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [addressLine1, setAddressLine1] = useState('');
@@ -48,6 +52,7 @@ export function NewAddressScreen() {
         state: state.trim(),
         postal_code: postalCode.trim(),
         delivery_instructions: deliveryInstructions.trim() || null,
+        recipient_type: recipientType,
         is_default: isDefault,
       });
       router.back();
@@ -66,6 +71,43 @@ export function NewAddressScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={styles.typeRow}>
+          <Pressable
+            onPress={() => setRecipientType('own')}
+            style={[
+              styles.typeChip,
+              { borderColor: theme.border },
+              recipientType === 'own' && { backgroundColor: theme.primary, borderColor: theme.primary },
+            ]}
+          >
+            <Text
+              style={[
+                styles.typeChipText,
+                { color: recipientType === 'own' ? theme.primaryText : theme.textPrimary },
+              ]}
+            >
+              Own Address
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setRecipientType('other')}
+            style={[
+              styles.typeChip,
+              { borderColor: theme.border },
+              recipientType === 'other' && { backgroundColor: theme.primary, borderColor: theme.primary },
+            ]}
+          >
+            <Text
+              style={[
+                styles.typeChipText,
+                { color: recipientType === 'other' ? theme.primaryText : theme.textPrimary },
+              ]}
+            >
+              Other&apos;s Address
+            </Text>
+          </Pressable>
+        </View>
+
         <FormTextInput label="Recipient name" value={recipientName} onChangeText={setRecipientName} />
         <FormTextInput
           label="Phone number"
@@ -128,6 +170,21 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
     paddingBottom: spacing.xxl,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  typeChip: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.sm,
+    alignItems: 'center',
+  },
+  typeChipText: {
+    ...typography.bodyStrong,
+    fontSize: 13,
   },
   row: {
     flexDirection: 'row',

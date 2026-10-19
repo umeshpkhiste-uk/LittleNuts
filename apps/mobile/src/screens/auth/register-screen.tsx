@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
@@ -11,14 +11,17 @@ import { goBack } from '@/lib/go-back';
 import { showAlert } from '@/lib/show-alert';
 import { supabase } from '@/lib/supabase/client';
 import { registerSchema, type RegisterInput } from '@/lib/validation/auth';
-import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 // Light, cream-and-forest-green look shared with the welcome and sign-in
-// screens (see src/theme/auth-light-palette.ts) — matches the brand
+// screens (see src/theme/colors.ts) — matches the brand
 // mockup at design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
 // littlenuts_register_screen/screen.png.
 export function RegisterScreen() {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const insets = useSafeAreaInsets();
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -193,7 +196,8 @@ export function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingHorizontal: spacing.xl,
@@ -270,7 +274,7 @@ const styles = StyleSheet.create({
   },
   ctaLabel: {
     ...typography.bodyStrong,
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   dividerRow: {
     flexDirection: 'row',

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 type LightInputProps = TextInputProps & {
@@ -10,10 +11,13 @@ type LightInputProps = TextInputProps & {
   error?: string;
 };
 
-// Plain white pill input used by the light-themed auth screens (Sign In,
-// Register) — see src/theme/auth-light-palette.ts. Not the dark-glass
-// FormTextInput used elsewhere in the app.
+// Plain white pill input used by the light-themed screens (Sign In,
+// Register, etc.). Not the dark-glass FormTextInput used elsewhere —
+// styled from the active theme (see src/theme/colors.ts) so it still
+// looks right if the user switches to dark mode.
 export function LightInput({ icon, error, secureTextEntry, style, ...inputProps }: LightInputProps) {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const [visible, setVisible] = useState(false);
   const isPassword = !!secureTextEntry;
 
@@ -42,36 +46,37 @@ export function LightInput({ icon, error, secureTextEntry, style, ...inputProps 
   );
 }
 
-const styles = StyleSheet.create({
-  inputGroup: {
-    gap: spacing.xs,
-  },
-  inputWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: radius.pill,
-    backgroundColor: COLORS.card,
-  },
-  inputWrapError: {
-    borderColor: COLORS.forgot,
-  },
-  inputIcon: {
-    marginLeft: spacing.md,
-  },
-  input: {
-    flex: 1,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm + 2,
-    fontSize: 15,
-    color: COLORS.heading,
-  },
-  inputRightIcon: {
-    paddingHorizontal: spacing.md,
-  },
-  inputError: {
-    ...typography.caption,
-    color: COLORS.forgot,
-  },
-});
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
+    inputGroup: {
+      gap: spacing.xs,
+    },
+    inputWrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: COLORS.border,
+      borderRadius: radius.pill,
+      backgroundColor: COLORS.card,
+    },
+    inputWrapError: {
+      borderColor: COLORS.forgot,
+    },
+    inputIcon: {
+      marginLeft: spacing.md,
+    },
+    input: {
+      flex: 1,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.sm + 2,
+      fontSize: 15,
+      color: COLORS.heading,
+    },
+    inputRightIcon: {
+      paddingHorizontal: spacing.md,
+    },
+    inputError: {
+      ...typography.caption,
+      color: COLORS.forgot,
+    },
+  });

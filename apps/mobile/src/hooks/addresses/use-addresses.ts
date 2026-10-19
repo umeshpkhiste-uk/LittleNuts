@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 
+export type RecipientType = 'own' | 'other';
+
 export type Address = {
   id: string;
   user_id: string;
@@ -15,6 +17,7 @@ export type Address = {
   state: string;
   postal_code: string;
   delivery_instructions: string | null;
+  recipient_type: RecipientType;
   is_default: boolean;
   created_at: string;
   updated_at: string;

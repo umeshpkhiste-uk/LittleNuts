@@ -26,14 +26,15 @@ import { useAddToCart, useCart } from '@/hooks/cart/use-cart';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
 import { FavoriteButton } from '@/components/favorite-button';
-import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 // Logged-in landing page, redesigned to match the brand mockup at
 // design-assets/App Design/stitch_littlenuts_dryfruit_shopping_app/
 // 5. littlenuts_dry_fruits_seeds_catalog/screen.png — same light
 // cream-and-forest-green look as the auth screens (see
-// src/theme/auth-light-palette.ts), replacing the app's dark glass
+// src/theme/colors.ts), replacing the app's dark glass
 // theme on this one screen. Shows the real catalog (all active
 // products from Supabase), not the mockup's placeholder products —
 // there's no rating/wishlist field on Product, so those bits of the
@@ -103,6 +104,8 @@ function shortCategoryLabel(name: string): string {
 }
 
 export function HomeScreen() {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const [group, setGroup] = useState<FilterGroup>('all');
   const [weightPreset, setWeightPreset] = useState<WeightOption>(250);
   const [sortMode, setSortMode] = useState<SortMode>('featured');
@@ -180,7 +183,7 @@ export function HomeScreen() {
           ) : null}
         </Pressable>
         <Pressable onPress={() => router.push('/account')} hitSlop={8} style={styles.avatarButton}>
-          <Ionicons name="person" size={16} color={COLORS.card} />
+          <Ionicons name="person" size={16} color={COLORS.primaryText} />
         </Pressable>
       </View>
 
@@ -218,7 +221,7 @@ export function HomeScreen() {
               }}
               style={[styles.filterPill, active ? styles.filterPillActive : styles.filterPillInactive]}
             >
-              <Text style={[styles.filterLabel, { color: active ? COLORS.card : COLORS.heading }]}>
+              <Text style={[styles.filterLabel, { color: active ? COLORS.primaryText : COLORS.heading }]}>
                 {filter.label}
               </Text>
             </Pressable>
@@ -243,7 +246,7 @@ export function HomeScreen() {
                 onPress={() => setWeightPreset(weight)}
                 style={[styles.weightPill, active ? styles.filterPillActive : styles.filterPillInactive]}
               >
-                <Text style={[styles.weightLabel, { color: active ? COLORS.card : COLORS.heading }]}>
+                <Text style={[styles.weightLabel, { color: active ? COLORS.primaryText : COLORS.heading }]}>
                   {formatWeight(weight)}
                 </Text>
               </Pressable>
@@ -262,7 +265,7 @@ export function HomeScreen() {
           <Text style={styles.promoSubtitle}>Zero added sugar, 100% whole fruits & super seeds.</Text>
         </View>
         <View style={styles.promoIconWrap}>
-          <Ionicons name="leaf-outline" size={28} color={COLORS.card} />
+          <Ionicons name="leaf-outline" size={28} color={COLORS.primaryText} />
         </View>
       </View>
 
@@ -316,6 +319,8 @@ function CatalogCard({
   weightPreset: WeightOption;
   onPress: () => void;
 }) {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const addToCart = useAddToCart();
   const [justAdded, setJustAdded] = useState(false);
 
@@ -383,7 +388,7 @@ function CatalogCard({
             hitSlop={8}
             style={[styles.cardAddButton, outOfStock && styles.cardAddButtonDisabled]}
           >
-            <Ionicons name={justAdded ? 'checkmark' : 'add'} size={18} color={COLORS.card} />
+            <Ionicons name={justAdded ? 'checkmark' : 'add'} size={18} color={COLORS.primaryText} />
           </Pressable>
         </View>
       </View>
@@ -391,7 +396,8 @@ function CatalogCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
   },
@@ -460,7 +466,7 @@ const styles = StyleSheet.create({
   cartBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   searchBar: {
     flexDirection: 'row',
@@ -556,7 +562,7 @@ const styles = StyleSheet.create({
   },
   promoTitle: {
     ...typography.h1,
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   promoSubtitle: {
     ...typography.caption,
@@ -672,7 +678,7 @@ const styles = StyleSheet.create({
   outOfStockText: {
     ...typography.caption,
     fontWeight: '700',
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   cardBody: {
     padding: spacing.sm,

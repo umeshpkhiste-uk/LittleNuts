@@ -10,7 +10,8 @@ import { useAddresses } from '@/hooks/addresses/use-addresses';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useStoreSettings } from '@/hooks/checkout/use-store-settings';
 import { useAuthStore } from '@/stores/auth-store';
-import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 // Redesigned to match the brand mockup (harvest cart screen) — same light
@@ -25,6 +26,8 @@ function shortCategoryLabel(name: string): string {
 }
 
 export function CartScreen() {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const session = useAuthStore((state) => state.session);
   const cart = useCart();
   const categories = useCategories();
@@ -115,7 +118,7 @@ export function CartScreen() {
             <Ionicons name="notifications-outline" size={18} color={COLORS.heading} />
           </Pressable>
           <Pressable onPress={() => router.push('/account')} hitSlop={8} style={styles.avatarButton}>
-            <Ionicons name="person" size={16} color={COLORS.card} />
+            <Ionicons name="person" size={16} color={COLORS.primaryText} />
           </Pressable>
         </View>
 
@@ -200,7 +203,7 @@ export function CartScreen() {
                     hitSlop={6}
                     style={[styles.stepperButton, styles.stepperButtonPrimary]}
                   >
-                    <Ionicons name="add" size={14} color={COLORS.card} />
+                    <Ionicons name="add" size={14} color={COLORS.primaryText} />
                   </Pressable>
                 </View>
               </View>
@@ -263,10 +266,10 @@ export function CartScreen() {
 
       <View style={styles.footer}>
         <Pressable style={styles.checkoutButton} onPress={() => router.push('/checkout')}>
-          <Ionicons name="lock-closed" size={16} color={COLORS.card} />
+          <Ionicons name="lock-closed" size={16} color={COLORS.primaryText} />
           <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
           <Text style={styles.checkoutButtonPrice}>{paiseToRupeesLabel(total)}</Text>
-          <Ionicons name="arrow-forward" size={16} color={COLORS.card} />
+          <Ionicons name="arrow-forward" size={16} color={COLORS.primaryText} />
         </Pressable>
         <Text style={styles.footerNote}>
           Safe 256-bit encrypted checkout with 100% crisp guarantee
@@ -285,6 +288,8 @@ function BillRow({
   value: string;
   highlight?: boolean;
 }) {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   return (
     <View style={styles.billRow}>
       <Text style={styles.billLabel}>{label}</Text>
@@ -293,7 +298,8 @@ function BillRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
   },
@@ -321,7 +327,7 @@ const styles = StyleSheet.create({
   },
   emptyButtonText: {
     ...typography.bodyStrong,
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   container: {
     padding: spacing.lg,
@@ -623,12 +629,12 @@ const styles = StyleSheet.create({
   },
   checkoutButtonText: {
     ...typography.bodyStrong,
-    color: COLORS.card,
+    color: COLORS.primaryText,
     flex: 1,
   },
   checkoutButtonPrice: {
     ...typography.bodyStrong,
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   footerNote: {
     ...typography.caption,

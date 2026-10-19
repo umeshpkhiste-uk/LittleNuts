@@ -50,7 +50,7 @@ function RootStack() {
 
   return (
     <NavigationThemeProvider value={navigationTheme}>
-      <StatusBar style="light" />
+      <StatusBar style={theme.mode === 'light' ? 'dark' : 'light'} />
       <AppShell>
         <AppBackground />
         <Stack

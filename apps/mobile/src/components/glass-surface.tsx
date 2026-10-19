@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 
+import { useAppTheme } from '@/theme/theme-provider';
 import { glassShadow, radius } from '@/theme/tokens';
 
 type GlassSurfaceProps = {
@@ -22,22 +23,26 @@ export function GlassSurface({
   children,
   style,
   intensity = 40,
-  tint = 'dark',
+  tint,
   radius: cornerRadius = radius.lg,
   bordered = true,
   glow = false,
 }: GlassSurfaceProps) {
+  const theme = useAppTheme();
+  const isLight = theme.mode === 'light';
+  const resolvedTint = tint ?? (isLight ? 'light' : 'dark');
+
   return (
     <View
       style={[
         { borderRadius: cornerRadius, overflow: 'hidden' },
-        bordered && styles.border,
+        bordered && (isLight ? styles.borderLight : styles.border),
         glow && glassShadow,
         style,
       ]}
     >
-      <BlurView intensity={intensity} tint={tint} style={styles.blur}>
-        <View style={styles.tintOverlay}>{children}</View>
+      <BlurView intensity={intensity} tint={resolvedTint} style={styles.blur}>
+        <View style={isLight ? styles.tintOverlayLight : styles.tintOverlay}>{children}</View>
       </BlurView>
     </View>
   );
@@ -51,8 +56,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
+  tintOverlayLight: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.45)',
+  },
   border: {
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
+  },
+  borderLight: {
+    borderWidth: 1,
+    borderColor: 'rgba(28,42,30,0.1)',
   },
 });

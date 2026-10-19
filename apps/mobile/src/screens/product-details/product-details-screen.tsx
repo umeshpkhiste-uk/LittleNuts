@@ -18,7 +18,8 @@ import { FavoriteButton } from '@/components/favorite-button';
 import { goBack } from '@/lib/go-back';
 import { useAuthStore } from '@/stores/auth-store';
 import { getProductDetailContent, VITALITY_ICON_STYLE } from '@/data/product-detail-content';
-import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 // Redesigned to match the brand mockup at
@@ -32,6 +33,8 @@ import { radius, spacing, typography } from '@/theme/tokens';
 // per product at render time.
 
 export function ProductDetailsScreen({ productId }: { productId: string }) {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const { data: product, isLoading } = useProduct(productId);
   const session = useAuthStore((state) => state.session);
   const addToCart = useAddToCart();
@@ -98,7 +101,7 @@ export function ProductDetailsScreen({ productId }: { productId: string }) {
           <Image source={require('../../../assets/icon.png')} style={styles.logo} resizeMode="cover" />
           <Text style={styles.headerTitle}>Product Details</Text>
           <Pressable onPress={() => router.push('/account')} hitSlop={8} style={styles.avatarButton}>
-            <Ionicons name="person" size={16} color={COLORS.card} />
+            <Ionicons name="person" size={16} color={COLORS.primaryText} />
           </Pressable>
         </View>
 
@@ -152,7 +155,7 @@ export function ProductDetailsScreen({ productId }: { productId: string }) {
                 onPress={() => setSelectedWeight(g)}
                 style={[styles.presetChip, active ? styles.presetChipActive : styles.presetChipInactive]}
               >
-                <Text style={[styles.presetWeight, { color: active ? COLORS.card : COLORS.heading }]}>
+                <Text style={[styles.presetWeight, { color: active ? COLORS.primaryText : COLORS.heading }]}>
                   {formatWeight(g)}
                 </Text>
                 <Text style={[styles.presetPrice, { color: active ? 'rgba(255,255,255,0.8)' : COLORS.subtitle }]}>
@@ -226,7 +229,7 @@ export function ProductDetailsScreen({ productId }: { productId: string }) {
             hitSlop={6}
             style={[styles.stepperButton, styles.stepperButtonPrimary]}
           >
-            <Ionicons name="add" size={16} color={COLORS.card} />
+            <Ionicons name="add" size={16} color={COLORS.primaryText} />
           </Pressable>
         </View>
         <Pressable
@@ -234,7 +237,7 @@ export function ProductDetailsScreen({ productId }: { productId: string }) {
           disabled={!valid || outOfStock || addToCart.isPending}
           style={[styles.addButton, (!valid || outOfStock) && styles.addButtonDisabled]}
         >
-          <Ionicons name="bag-handle-outline" size={16} color={COLORS.card} />
+          <Ionicons name="bag-handle-outline" size={16} color={COLORS.primaryText} />
           <Text style={styles.addButtonText}>
             {session ? 'Add to Basket' : 'Log In to Add'}
           </Text>
@@ -244,7 +247,8 @@ export function ProductDetailsScreen({ productId }: { productId: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
   },
@@ -554,6 +558,6 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     ...typography.bodyStrong,
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
 });

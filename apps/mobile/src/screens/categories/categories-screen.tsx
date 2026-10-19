@@ -23,12 +23,13 @@ import { useAddToCart, useCart, useSetCartItemQuantity } from '@/hooks/cart/use-
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
 import { FavoriteButton } from '@/components/favorite-button';
-import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
+import type { AppTheme } from '@/theme/colors';
+import { useAppTheme } from '@/theme/theme-provider';
 import { radius, spacing, typography } from '@/theme/tokens';
 
 // Redesigned to match the brand mockup (categories/catalog grid screen) —
 // same light cream-and-forest-green look as Home (see
-// src/theme/auth-light-palette.ts). Uses the real catalog and the same
+// src/theme/colors.ts). Uses the real catalog and the same
 // product photos as Home, not fictional mockup placeholders. No star
 // rating (no backing field); heart/favorite is a non-persisted UI stub
 // like on Home; the +/- quantity control is real, backed by the same
@@ -48,6 +49,8 @@ function shortCategoryLabel(name: string): string {
 }
 
 export function CategoriesScreen() {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const [categoryId, setCategoryId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<TextInput>(null);
@@ -133,7 +136,7 @@ export function CategoriesScreen() {
           }}
           style={[styles.pill, categoryId === 'all' ? styles.pillActive : styles.pillInactive]}
         >
-          <Text style={[styles.pillLabel, { color: categoryId === 'all' ? COLORS.card : COLORS.heading }]}>
+          <Text style={[styles.pillLabel, { color: categoryId === 'all' ? COLORS.primaryText : COLORS.heading }]}>
             All
           </Text>
         </Pressable>
@@ -148,7 +151,7 @@ export function CategoriesScreen() {
               }}
               style={[styles.pill, active ? styles.pillActive : styles.pillInactive]}
             >
-              <Text style={[styles.pillLabel, { color: active ? COLORS.card : COLORS.heading }]}>
+              <Text style={[styles.pillLabel, { color: active ? COLORS.primaryText : COLORS.heading }]}>
                 {shortCategoryLabel(category.name)}
               </Text>
             </Pressable>
@@ -195,6 +198,8 @@ function CategoryProductCard({
   tagColor: (typeof TAG_PALETTE)[number];
   onPress: () => void;
 }) {
+  const COLORS = useAppTheme();
+  const styles = useMemo(() => createStyles(COLORS), [COLORS]);
   const cart = useCart();
   const addToCart = useAddToCart();
   const setQuantity = useSetCartItemQuantity();
@@ -249,7 +254,7 @@ function CategoryProductCard({
 
           {outOfStock ? (
             <View style={[styles.cardAddButton, styles.cardAddButtonDisabled]}>
-              <Ionicons name="add" size={18} color={COLORS.card} />
+              <Ionicons name="add" size={18} color={COLORS.primaryText} />
             </View>
           ) : cartItem ? (
             <View style={styles.stepper}>
@@ -280,7 +285,7 @@ function CategoryProductCard({
                 hitSlop={6}
                 style={[styles.stepperButton, styles.stepperButtonPrimary]}
               >
-                <Ionicons name="add" size={14} color={COLORS.card} />
+                <Ionicons name="add" size={14} color={COLORS.primaryText} />
               </Pressable>
             </View>
           ) : (
@@ -293,7 +298,7 @@ function CategoryProductCard({
               hitSlop={8}
               style={styles.cardAddButton}
             >
-              <Ionicons name="add" size={18} color={COLORS.card} />
+              <Ionicons name="add" size={18} color={COLORS.primaryText} />
             </Pressable>
           )}
         </View>
@@ -302,7 +307,8 @@ function CategoryProductCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: AppTheme) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
   },
@@ -345,7 +351,7 @@ const styles = StyleSheet.create({
   cartBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   searchBar: {
     flexDirection: 'row',
@@ -471,7 +477,7 @@ const styles = StyleSheet.create({
   outOfStockText: {
     ...typography.caption,
     fontWeight: '700',
-    color: COLORS.card,
+    color: COLORS.primaryText,
   },
   cardBody: {
     padding: spacing.sm,

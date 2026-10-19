@@ -4,7 +4,6 @@ import type { ColorValue } from 'react-native';
 
 import { GlassTabBarBackground } from '@/components/glass-tab-bar-background';
 import { useCart } from '@/hooks/cart/use-cart';
-import { palette } from '@/theme/colors';
 import { useAppTheme } from '@/theme/theme-provider';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -64,7 +63,7 @@ export default function CustomerTabsLayout() {
           title: 'Cart',
           tabBarIcon: tabIcon('cart', 'cart-outline'),
           tabBarBadge: cartCount > 0 ? cartCount : undefined,
-          tabBarBadgeStyle: { backgroundColor: palette.gold, color: palette.navyBase },
+          tabBarBadgeStyle: { backgroundColor: theme.primary, color: theme.primaryText },
         }}
       />
       <Tabs.Screen

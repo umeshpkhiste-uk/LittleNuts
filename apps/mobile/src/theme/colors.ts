@@ -1,9 +1,11 @@
-// Dark glassmorphism theme — the app's one and only look (no light mode).
-// `background` is intentionally transparent: the actual dark/navy surface
-// comes from <AppBackground /> (mounted once, in src/app/_layout.tsx),
-// so every screen that paints itself with `theme.background` reveals that
-// shared glow instead of a flat color, which is what makes translucent
-// glass panels in front of it actually read as glass.
+// Two real themes now: the original dark glassmorphism look, and a light
+// cream-and-forest-green look (introduced screen-by-screen, now wired up as
+// an actual switchable theme — see theme-provider.tsx / theme-store.ts).
+// Both objects below implement the exact same `ThemeColors` shape so every
+// screen can read whichever is active through the one `useAppTheme()` hook,
+// regardless of which naming convention that screen happens to use
+// (textPrimary/surface/... from the original dark screens, or
+// heading/subtitle/card/... from the newer light-redesigned screens).
 export const palette = {
   navyBase: '#0A0E17',
   navyDeep: '#05070C',
@@ -23,8 +25,58 @@ export const palette = {
   glassBorderStrong: 'rgba(255,255,255,0.2)',
 } as const;
 
-export const darkTheme = {
-  mode: 'dark' as const,
+export const lightPalette = {
+  cream: '#F8F3EA',
+  card: '#FFFFFF',
+  border: '#E8E1D2',
+  borderStrong: '#D8CFBA',
+  badgeBg: '#EDE6D6',
+  badgeText: '#2B2B22',
+  badgeDot: '#5B7B4A',
+  heading: '#1C2A1E',
+  subtitle: '#8B8A80',
+  textMuted: '#A9A79C',
+  button: '#17241B',
+  buttonLight: '#2E3F27',
+  accent: '#5B8A4A',
+  forgot: '#C1502E',
+} as const;
+
+export type ThemeColors = {
+  mode: 'dark' | 'light';
+  // Original dark-glass naming.
+  background: string;
+  backgroundSolid: string;
+  surface: string;
+  card: string;
+  cardStrong: string;
+  border: string;
+  borderStrong: string;
+  primary: string;
+  primaryLight: string;
+  primaryText: string;
+  accent: string;
+  danger: string;
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  tabBarBackground: string;
+  tabBarActive: string;
+  tabBarInactive: string;
+  // Newer light-screen naming (Home/Categories/Product Details/Cart/
+  // Profile/onboarding/auth) — kept as aliases so those screens don't need
+  // their JSX/styles rewritten, only their color *source* swapped.
+  heading: string;
+  subtitle: string;
+  button: string;
+  badgeBg: string;
+  badgeText: string;
+  badgeDot: string;
+  forgot: string;
+};
+
+export const darkTheme: ThemeColors = {
+  mode: 'dark',
   background: 'transparent',
   backgroundSolid: palette.navyBase,
   surface: palette.glassWhite,
@@ -43,10 +95,42 @@ export const darkTheme = {
   tabBarBackground: 'rgba(10,14,23,0.72)',
   tabBarActive: palette.gold,
   tabBarInactive: palette.textMuted,
+  heading: palette.textPrimary,
+  subtitle: palette.textSecondary,
+  button: palette.gold,
+  badgeBg: 'rgba(255,255,255,0.08)',
+  badgeText: palette.textPrimary,
+  badgeDot: palette.green,
+  forgot: palette.red,
 };
 
-// Kept only so any stray `lightTheme` import doesn't crash the build —
-// the app never selects it. Remove once nothing references it.
-export const lightTheme = darkTheme;
+export const lightTheme: ThemeColors = {
+  mode: 'light',
+  background: 'transparent',
+  backgroundSolid: lightPalette.cream,
+  surface: lightPalette.badgeBg,
+  card: lightPalette.card,
+  cardStrong: lightPalette.card,
+  border: lightPalette.border,
+  borderStrong: lightPalette.borderStrong,
+  primary: lightPalette.button,
+  primaryLight: lightPalette.buttonLight,
+  primaryText: '#FFFFFF',
+  accent: lightPalette.accent,
+  danger: lightPalette.forgot,
+  textPrimary: lightPalette.heading,
+  textSecondary: lightPalette.subtitle,
+  textMuted: lightPalette.textMuted,
+  tabBarBackground: 'rgba(255,255,255,0.85)',
+  tabBarActive: lightPalette.button,
+  tabBarInactive: lightPalette.subtitle,
+  heading: lightPalette.heading,
+  subtitle: lightPalette.subtitle,
+  button: lightPalette.button,
+  badgeBg: lightPalette.badgeBg,
+  badgeText: lightPalette.badgeText,
+  badgeDot: lightPalette.badgeDot,
+  forgot: lightPalette.forgot,
+};
 
-export type AppTheme = typeof darkTheme;
+export type AppTheme = ThemeColors;
