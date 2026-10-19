@@ -120,7 +120,9 @@ export function CategoriesScreen() {
             <Ionicons name="close-circle" size={18} color={COLORS.subtitle} />
           </Pressable>
         ) : (
-          <Ionicons name="options-outline" size={18} color={COLORS.subtitle} />
+          <Pressable hitSlop={8}>
+            <Ionicons name="mic-outline" size={18} color={COLORS.subtitle} />
+          </Pressable>
         )}
       </View>
 

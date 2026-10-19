@@ -135,7 +135,11 @@ export function AccountScreen() {
         <Ionicons name="log-out-outline" size={16} color={theme.danger} />
         <Text style={[styles.signOutText, { color: theme.danger }]}>Sign Out of LittleNuts</Text>
       </Pressable>
-      <Pressable onPress={handleDeleteAccount} hitSlop={8} style={styles.deleteAccountButton}>
+      <Pressable
+        style={[styles.deleteAccountButton, { borderColor: theme.border }]}
+        onPress={handleDeleteAccount}
+      >
+        <Ionicons name="trash-outline" size={16} color={theme.textSecondary} />
         <Text style={[styles.deleteAccountText, { color: theme.textSecondary }]}>Delete My Account</Text>
       </Pressable>
 
@@ -314,13 +318,17 @@ const styles = StyleSheet.create({
     ...typography.bodyStrong,
   },
   deleteAccountButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.sm,
+    justifyContent: 'center',
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.sm + 2,
+    marginTop: spacing.sm,
   },
   deleteAccountText: {
-    ...typography.caption,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
+    ...typography.bodyStrong,
   },
   adminLink: {
     alignSelf: 'center',

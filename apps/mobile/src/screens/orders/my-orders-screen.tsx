@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { paiseToRupeesLabel } from '@littlenuts/shared';
 
@@ -17,6 +18,9 @@ export function MyOrdersScreen() {
   if (!session) {
     return (
       <View style={[styles.empty, { backgroundColor: theme.background }]}>
+        <View style={[styles.emptyIconWrap, { backgroundColor: theme.badgeBg }]}>
+          <Ionicons name="person-circle-outline" size={44} color={theme.accent} />
+        </View>
         <Text style={[styles.emptyTitle, { color: theme.textPrimary }]}>My Orders</Text>
         <Text style={[styles.emptyBody, { color: theme.textSecondary }]}>
           Log in to view your order history.
@@ -37,9 +41,15 @@ export function MyOrdersScreen() {
   if (!orders.data?.length) {
     return (
       <View style={[styles.empty, { backgroundColor: theme.background }]}>
+        <View style={[styles.emptyIconWrap, { backgroundColor: theme.badgeBg }]}>
+          <Text style={styles.emptyIconEmoji}>🥜</Text>
+          <View style={[styles.emptyIconBadge, { backgroundColor: theme.card, borderColor: theme.badgeBg }]}>
+            <Ionicons name="receipt-outline" size={18} color={theme.accent} />
+          </View>
+        </View>
         <Text style={[styles.emptyTitle, { color: theme.textPrimary }]}>No orders yet</Text>
         <Text style={[styles.emptyBody, { color: theme.textSecondary }]}>
-          Your placed orders will show up here.
+          Your harvest basket is empty for now. Place your first order and{'\n'}it will show up right here.
         </Text>
         <PrimaryButton title="Browse Products" onPress={() => router.push('/(customer)/(tabs)')} />
       </View>
@@ -84,12 +94,35 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     gap: spacing.md,
   },
+  emptyIconWrap: {
+    width: 104,
+    height: 104,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
+  },
+  emptyIconEmoji: {
+    fontSize: 44,
+  },
+  emptyIconBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 34,
+    height: 34,
+    borderRadius: radius.pill,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   emptyTitle: {
     ...typography.h1,
   },
   emptyBody: {
     ...typography.body,
     textAlign: 'center',
+    lineHeight: 21,
   },
   container: {
     padding: spacing.lg,
