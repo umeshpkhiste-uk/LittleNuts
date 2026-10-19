@@ -6,6 +6,10 @@
 // the original screens, heading/subtitle/card/... from the newer ones)
 // so every screen can keep using whichever it already had, all reading
 // from this one object via useAppTheme().
+// Palette matched to the LittleNuts logo (assets/icon.png): a deep
+// plum/aubergine badge with gold lettering on a cream background.
+// `button`/`buttonLight` carry the plum, `accent`/`badgeDot` carry the
+// gold — replacing the near-black brand color the app used before.
 export const lightPalette = {
   cream: '#F8F3EA',
   card: '#FFFFFF',
@@ -13,13 +17,13 @@ export const lightPalette = {
   borderStrong: '#D8CFBA',
   badgeBg: '#EDE6D6',
   badgeText: '#2B2B22',
-  badgeDot: '#5B7B4A',
+  badgeDot: '#C79A3C',
   heading: '#1C2A1E',
   subtitle: '#8B8A80',
   textMuted: '#A9A79C',
-  button: '#17241B',
-  buttonLight: '#2E3F27',
-  accent: '#5B8A4A',
+  button: '#3B2250',
+  buttonLight: '#5C3B74',
+  accent: '#C79A3C',
   forgot: '#C1502E',
 } as const;
 

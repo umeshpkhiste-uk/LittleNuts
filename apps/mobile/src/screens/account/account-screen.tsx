@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { paiseToRupeesLabel, sumPaise } from '@littlenuts/shared';
@@ -47,7 +47,7 @@ export function AccountScreen() {
   if (!session) {
     return (
       <View style={[styles.empty, { backgroundColor: theme.background }]}>
-        <Ionicons name="person-circle-outline" size={48} color={theme.textSecondary} />
+        <Image source={require('../../../assets/icon.png')} style={styles.emptyLogo} resizeMode="cover" />
         <Text style={[styles.emptyTitle, { color: theme.textPrimary }]}>Log in to LittleNuts</Text>
         <Text style={[styles.emptyBody, { color: theme.textSecondary }]}>
           Log in to manage your addresses, place orders, and track deliveries.
@@ -198,6 +198,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.xl,
     gap: spacing.md,
+  },
+  emptyLogo: {
+    width: 96,
+    height: 96,
+    borderRadius: radius.pill,
+    marginBottom: spacing.xs,
   },
   emptyTitle: {
     ...typography.h1,

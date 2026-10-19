@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { paiseToRupeesLabel } from '@littlenuts/shared';
@@ -18,9 +18,7 @@ export function MyOrdersScreen() {
   if (!session) {
     return (
       <View style={[styles.empty, { backgroundColor: theme.background }]}>
-        <View style={[styles.emptyIconWrap, { backgroundColor: theme.badgeBg }]}>
-          <Ionicons name="person-circle-outline" size={44} color={theme.accent} />
-        </View>
+        <Image source={require('../../../assets/icon.png')} style={styles.emptyLogo} resizeMode="cover" />
         <Text style={[styles.emptyTitle, { color: theme.textPrimary }]}>My Orders</Text>
         <Text style={[styles.emptyBody, { color: theme.textSecondary }]}>
           Log in to view your order history.
@@ -93,6 +91,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.xl,
     gap: spacing.md,
+  },
+  emptyLogo: {
+    width: 96,
+    height: 96,
+    borderRadius: radius.pill,
+    marginBottom: spacing.xs,
   },
   emptyIconWrap: {
     width: 104,

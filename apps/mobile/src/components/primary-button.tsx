@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
   },
   fill: {
     paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
   },
