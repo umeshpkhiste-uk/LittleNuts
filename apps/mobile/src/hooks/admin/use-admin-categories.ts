@@ -40,3 +40,50 @@ export function useSetCategoryActive() {
     },
   });
 }
+
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      name,
+      description,
+    }: {
+      id: string;
+      name: string;
+      description: string;
+    }) => {
+      const { error } = await supabase
+        .from('categories')
+        .update({ name, slug: slugify(name), description: description.trim() || null })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('categories').delete().eq('id', id);
+      if (error) {
+        // products.category_id -> categories.id is "on delete restrict",
+        // so Postgres refuses this with a foreign_key_violation (23503)
+        // instead of silently orphaning products.
+        if (error.code === '23503') {
+          throw new Error(
+            'This category still has products in it. Move or delete those products first.',
+          );
+        }
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+}
