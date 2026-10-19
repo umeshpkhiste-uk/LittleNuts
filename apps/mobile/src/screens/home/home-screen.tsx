@@ -1,5 +1,14 @@
-import { useMemo, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -96,6 +105,8 @@ export function HomeScreen() {
   const [group, setGroup] = useState<FilterGroup>('all');
   const [weightPreset, setWeightPreset] = useState<WeightOption>(250);
   const [sortMode, setSortMode] = useState<SortMode>('featured');
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<TextInput>(null);
 
   const categories = useCategories();
   const products = useProducts({});
@@ -109,12 +120,16 @@ export function HomeScreen() {
     [categories.data],
   );
 
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
   const filtered = useMemo(
     () =>
-      (products.data ?? []).filter(
-        (product) => group === 'all' || categoryIdToGroup.get(product.category_id) === group,
-      ),
-    [products.data, group, categoryIdToGroup],
+      (products.data ?? []).filter((product) => {
+        if (group !== 'all' && categoryIdToGroup.get(product.category_id) !== group) return false;
+        if (normalizedQuery && !product.name.toLowerCase().includes(normalizedQuery)) return false;
+        return true;
+      }),
+    [products.data, group, categoryIdToGroup, normalizedQuery],
   );
 
   const sorted = useMemo(() => {
@@ -150,7 +165,7 @@ export function HomeScreen() {
             <Text style={styles.deliveryText}>Deliver to Home · 24 mins</Text>
           </View>
         </View>
-        <Pressable onPress={() => router.push('/search')} hitSlop={8} style={styles.headerIcon}>
+        <Pressable onPress={() => searchInputRef.current?.focus()} hitSlop={8} style={styles.headerIcon}>
           <Ionicons name="search" size={18} color={COLORS.heading} />
         </Pressable>
         <Pressable onPress={() => router.push('/notifications')} hitSlop={8} style={styles.headerIcon}>
@@ -161,11 +176,24 @@ export function HomeScreen() {
         </Pressable>
       </View>
 
-      <Pressable onPress={() => router.push('/search')} style={styles.searchBar}>
+      <View style={styles.searchBar}>
         <Ionicons name="search" size={18} color={COLORS.subtitle} />
-        <Text style={styles.searchPlaceholder}>Search walnuts, dates, raw seeds...</Text>
-        <Ionicons name="options-outline" size={18} color={COLORS.subtitle} />
-      </Pressable>
+        <TextInput
+          ref={searchInputRef}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search walnuts, dates, raw seeds..."
+          placeholderTextColor={COLORS.subtitle}
+          style={styles.searchInput}
+        />
+        {searchQuery ? (
+          <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+            <Ionicons name="close-circle" size={18} color={COLORS.subtitle} />
+          </Pressable>
+        ) : (
+          <Ionicons name="options-outline" size={18} color={COLORS.subtitle} />
+        )}
+      </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
         {FILTERS.map((filter) => {
@@ -229,7 +257,11 @@ export function HomeScreen() {
           <Text style={styles.sectionTitle}>Boutique Collection</Text>
           <Text style={styles.sectionCount}>{sorted.length} items</Text>
         </View>
-        <Pressable onPress={() => router.push('/search')} hitSlop={8} style={styles.dailyPicksLink}>
+        <Pressable
+          onPress={() => setSortMode('featured')}
+          hitSlop={8}
+          style={styles.dailyPicksLink}
+        >
           <Ionicons name="flash-outline" size={14} color={COLORS.accent} />
           <Text style={styles.dailyPicksText}>Daily Picks</Text>
         </Pressable>
@@ -237,7 +269,7 @@ export function HomeScreen() {
 
       {isLoading ? (
         <ActivityIndicator color={COLORS.button} style={styles.loading} />
-      ) : (
+      ) : sorted.length ? (
         <View style={styles.grid}>
           {sorted.map((product, index) => (
             <CatalogCard
@@ -250,6 +282,8 @@ export function HomeScreen() {
             />
           ))}
         </View>
+      ) : (
+        <Text style={styles.emptyText}>No products match your search.</Text>
       )}
     </ScrollView>
   );
@@ -413,10 +447,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
   },
-  searchPlaceholder: {
+  searchInput: {
     ...typography.body,
     flex: 1,
-    color: COLORS.subtitle,
+    color: COLORS.heading,
+    paddingVertical: 0,
   },
   filterRow: {
     gap: spacing.sm,
@@ -538,6 +573,12 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
   },
   loading: {
+    marginTop: spacing.xl,
+  },
+  emptyText: {
+    ...typography.body,
+    color: COLORS.subtitle,
+    textAlign: 'center',
     marginTop: spacing.xl,
   },
   grid: {
