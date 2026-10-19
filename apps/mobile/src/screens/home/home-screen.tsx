@@ -25,6 +25,7 @@ import {
 import { useAddToCart, useCart } from '@/hooks/cart/use-cart';
 import { useCategories } from '@/hooks/catalog/use-categories';
 import { useProducts } from '@/hooks/catalog/use-products';
+import { FavoriteButton } from '@/components/favorite-button';
 import { AUTH_LIGHT_COLORS as COLORS } from '@/theme/auth-light-palette';
 import { radius, spacing, typography } from '@/theme/tokens';
 
@@ -316,7 +317,6 @@ function CatalogCard({
   onPress: () => void;
 }) {
   const addToCart = useAddToCart();
-  const [liked, setLiked] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
   const displayWeight = resolveDisplayWeight(product, weightPreset);
@@ -341,16 +341,12 @@ function CatalogCard({
             </Text>
           </View>
         ) : null}
-        <Pressable
-          onPress={(event) => {
-            event.stopPropagation();
-            setLiked((v) => !v);
-          }}
-          hitSlop={8}
+        <FavoriteButton
+          productId={product.id}
+          activeColor={tagColor.text}
+          inactiveColor={COLORS.subtitle}
           style={styles.cardHeart}
-        >
-          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={16} color={liked ? tagColor.text : COLORS.subtitle} />
-        </Pressable>
+        />
         {outOfStock ? (
           <View style={styles.outOfStockBadge}>
             <Text style={styles.outOfStockText}>Out of stock</Text>

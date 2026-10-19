@@ -14,6 +14,7 @@ import {
 
 import { useAddToCart } from '@/hooks/cart/use-cart';
 import { useProduct } from '@/hooks/catalog/use-products';
+import { FavoriteButton } from '@/components/favorite-button';
 import { goBack } from '@/lib/go-back';
 import { useAuthStore } from '@/stores/auth-store';
 import { getProductDetailContent, VITALITY_ICON_STYLE } from '@/data/product-detail-content';
@@ -37,7 +38,6 @@ export function ProductDetailsScreen({ productId }: { productId: string }) {
 
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
   const [quantityCount, setQuantityCount] = useState(1);
-  const [liked, setLiked] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const presets = useMemo(() => {
@@ -119,13 +119,13 @@ export function ProductDetailsScreen({ productId }: { productId: string }) {
               <Ionicons name="leaf" size={12} color={COLORS.accent} />
               <Text style={styles.freshnessTagText}>Freshly Handpicked</Text>
             </View>
-            <Pressable
-              onPress={() => setLiked((v) => !v)}
-              hitSlop={8}
+            <FavoriteButton
+              productId={activeProduct.id}
+              size={20}
+              activeColor={COLORS.forgot}
+              inactiveColor={COLORS.forgot}
               style={styles.imageHeartButton}
-            >
-              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={20} color={COLORS.forgot} />
-            </Pressable>
+            />
           </View>
           <Text style={styles.originTag}>{content.originTag}</Text>
         </View>

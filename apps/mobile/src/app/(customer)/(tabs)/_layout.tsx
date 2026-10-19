@@ -69,7 +69,7 @@ export default function CustomerTabsLayout() {
       />
       <Tabs.Screen
         name="account"
-        options={{ title: 'Account', tabBarIcon: tabIcon('person', 'person-outline') }}
+        options={{ title: 'Profile', tabBarIcon: tabIcon('person', 'person-outline') }}
       />
     </Tabs>
   );
