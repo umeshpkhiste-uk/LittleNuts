@@ -67,8 +67,7 @@ join public.categories c on c.slug = p.category_slug
 on conflict (slug) do nothing;
 
 -- Real product/category photos (uploaded to the public product-images
--- bucket); keeps the seed in sync with the live DB. No photo yet for
--- turkish-dried-apricots / dried-apricots.
+-- bucket); keeps the seed in sync with the live DB.
 update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/almonds.jpg' where slug = 'almonds-badam';
 update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/cashews.jpg' where slug = 'cashews-kaju';
 update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/pistachios.jpg' where slug = 'pistachios-pista';
@@ -79,7 +78,11 @@ update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.
 update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/mixes.jpg' where slug = 'mixed-dry-fruits';
 update public.categories set image_url = 'https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/seeds.jpg' where slug = 'seeds';
 
-update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/almonds.jpg'] where slug in ('california-almonds', 'mamra-almonds');
+update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/almonds.jpg'] where slug = 'california-almonds';
+-- Mamra almonds are visually distinct (smaller, denser) from the regular
+-- California almonds sharing the category photo above — free-license photo
+-- (Unsplash License: free for commercial use, no attribution required).
+update public.products set image_urls = array['https://images.unsplash.com/photo-1508779018996-601e37fa274e?w=1200&q=80&auto=format&fit=crop'] where slug = 'mamra-almonds';
 update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/cashews.jpg'] where slug = 'whole-cashews-w240';
 update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/pistachios.jpg'] where slug = 'roasted-salted-pistachios';
 update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/walnuts.jpg'] where slug = 'kashmiri-walnut-kernels';
@@ -88,3 +91,6 @@ update public.products set image_urls = array['https://oaslejowibcvprddusbv.supa
 update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/figs.jpg'] where slug = 'afghani-dried-figs';
 update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/mixes.jpg'] where slug = 'festive-mix';
 update public.products set image_urls = array['https://oaslejowibcvprddusbv.supabase.co/storage/v1/object/public/product-images/categories/seeds.jpg'] where slug = 'roasted-pumpkin-seeds';
+-- Free-license photo (Pexels License: free for commercial use, no
+-- attribution required).
+update public.products set image_urls = array['https://images.pexels.com/photos/29060107/pexels-photo-29060107.jpeg?auto=compress&cs=tinysrgb&w=1200'] where slug = 'turkish-dried-apricots';
