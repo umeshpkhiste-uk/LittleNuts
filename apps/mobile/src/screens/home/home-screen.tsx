@@ -201,7 +201,10 @@ export function HomeScreen() {
           return (
             <Pressable
               key={filter.key}
-              onPress={() => setGroup(filter.key)}
+              onPress={() => {
+                setGroup(filter.key);
+                setSearchQuery('');
+              }}
               style={[styles.filterPill, active ? styles.filterPillActive : styles.filterPillInactive]}
             >
               <Text style={[styles.filterLabel, { color: active ? COLORS.card : COLORS.heading }]}>
