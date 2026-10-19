@@ -181,7 +181,10 @@ export function HomeScreen() {
         <TextInput
           ref={searchInputRef}
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={(text) => {
+            setSearchQuery(text);
+            if (text) setGroup('all');
+          }}
           placeholder="Search walnuts, dates, raw seeds..."
           placeholderTextColor={COLORS.subtitle}
           style={styles.searchInput}
