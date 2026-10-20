@@ -89,8 +89,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: lightPalette.borderStrong,
+    // 100vh on mobile browsers is the *largest* possible viewport height —
+    // it includes the space the collapsible address bar can occupy even
+    // while it's currently showing. That made this box taller than what's
+    // actually visible, turning the page scrollable and pushing the
+    // floating tab bar (the last thing in the layout) below the fold.
+    // 100dvh tracks the real, currently-visible viewport instead.
     // @ts-expect-error -- web-only CSS value, ignored by the native typings
-    minHeight: '100vh',
+    minHeight: '100dvh',
   },
   webFrame: {
     flex: 1,
