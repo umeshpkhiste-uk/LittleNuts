@@ -155,10 +155,6 @@ export function AccountScreen() {
           <Ionicons name="trash-outline" size={16} color={theme.textSecondary} />
           <Text style={[styles.deleteAccountText, { color: theme.textSecondary }]}>Delete My Account</Text>
         </Pressable>
-
-        <Pressable onPress={() => router.push('/auth/admin-login')} hitSlop={8} style={styles.adminLink}>
-          <Text style={[styles.adminLinkText, { color: theme.textSecondary }]}>Store Admin</Text>
-        </Pressable>
       </View>
     </ScrollView>
   );
@@ -365,12 +361,5 @@ const styles = StyleSheet.create({
   },
   deleteAccountText: {
     ...typography.bodyStrong,
-  },
-  adminLink: {
-    alignSelf: 'center',
-    paddingVertical: spacing.md,
-  },
-  adminLinkText: {
-    ...typography.caption,
   },
 });
